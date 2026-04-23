@@ -1,0 +1,48 @@
+/* Cores Base Místicas */
+:root {
+  --bg-dark: #121815; /* Verde musgo quase preto */
+  --card-bg: #1e2621;
+  --neon-emerald: #34d399;
+}
+
+body {
+  background-color: var(--bg-dark);
+  font-family: 'Inter', sans-serif;
+  color: #e5e7eb;
+}
+
+/* Ocultar scrollbar das abas */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Animação Mística de Carregamento (O 2 segundos de mágica) */
+.magic-loader {
+  border: 4px solid rgba(52, 211, 153, 0.2);
+  border-left-color: var(--neon-emerald);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite, glow 1.5s alternate infinite;
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes glow { 0% { box-shadow: 0 0 10px rgba(52, 211, 153, 0.2); } 100% { box-shadow: 0 0 30px rgba(52, 211, 153, 0.8); } }
+
+/* Estilo Carta de Tarot Moderno */
+.tarot-card {
+  background-color: var(--card-bg);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 20px rgba(52, 211, 153, 0.1);
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+}
+
+/* Força a câmera do TM a cobrir o quadrado */
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 1rem;
+}

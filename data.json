@@ -1,0 +1,29 @@
+{
+  "ametista": {
+    "nome": "Ametista",
+    "signos": ["Aquário", "Peixes", "Sagitário"],
+    "energia": "Transmutação, intuição e calma mental. Afasta a negatividade.",
+    "sugestao_uso": "Use como colar na altura do peito ou deixe no quarto para melhorar o sono.",
+    "origem": "Brasil (RS) e Uruguai.",
+    "geologia": "Variedade roxa do quartzo, formada em cavidades vulcânicas (geodos).",
+    "imagem_url": "https://images.unsplash.com/photo-1590795431604-94c6cb7e9895?w=500&auto=format"
+  },
+  "pirita": {
+    "nome": "Pirita",
+    "signos": ["Leão", "Áries"],
+    "energia": "Prosperidade, sucesso e escudo energético contra inveja.",
+    "sugestao_uso": "Mantenha na sua mesa de trabalho ou junto com dinheiro.",
+    "origem": "Peru, Espanha e EUA.",
+    "geologia": "Sulfeto de ferro, conhecida como 'Ouro dos Tolos'.",
+    "imagem_url": "https://images.unsplash.com/photo-1629472304918-a6d10dbba19f?w=500&auto=format"
+  },
+  "quartzo-rosa": {
+    "nome": "Quartzo Rosa",
+    "signos": ["Touro", "Libra"],
+    "energia": "Amor incondicional, paz infinita e cura emocional.",
+    "sugestao_uso": "Use próximo ao coração para atrair harmonia.",
+    "origem": "Brasil, Madagascar e EUA.",
+    "geologia": "Dióxido de silício com traços de titânio, ferro ou manganês.",
+    "imagem_url": "https://images.unsplash.com/photo-1596400326442-1e9bf9274296?w=500&auto=format"
+  }
+}
