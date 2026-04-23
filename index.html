@@ -3,103 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Luz da Floresta | Oráculo de Cristais</title>
+    <title>Luz da Floresta | Guia de Cristais</title>
     
-    <!-- CSS Externo -->
     <link rel="stylesheet" href="style.css">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Ícones Lucide -->
+    <script>
+        // Configuração do Tailwind para aceitar as variáveis do CSS
+        tailwind.config = { darkMode: 'class' }
+    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- TensorFlow.js & Teachable Machine -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 </head>
-<body class="antialiased pb-20">
+<body class="antialiased overflow-hidden">
 
-    <!-- Container do WebApp -->
-    <main class="max-w-md mx-auto min-h-screen relative shadow-2xl bg-[#121815]">
+    <!-- Container Principal: 100% da tela, sem scroll. Divide-se em Header, Miolo e Footer -->
+    <main class="max-w-md mx-auto h-[100dvh] flex flex-col relative shadow-2xl transition-colors" style="background-color: var(--bg-color);">
         
-        <!-- Header -->
-        <header class="p-5 border-b border-gray-800 sticky top-0 z-40 bg-[#121815]/90 backdrop-blur-md text-center">
-            <h1 class="text-2xl font-bold text-emerald-400 text-glow font-serif">Luz da Floresta</h1>
-            <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest">Oráculo de Cristais</p>
+        <!-- HEADER FIXO -->
+        <header class="p-4 flex justify-between items-center border-b z-40 transition-colors" style="border-color: var(--border-color); background-color: var(--bg-color);">
+            <div>
+                <!-- Fonte estilizada lembrando a logo -->
+                <h1 class="text-2xl font-serif font-bold tracking-tight" style="color: var(--text-main);">Luz da Floresta</h1>
+                <p class="text-[10px] uppercase tracking-widest font-bold" style="color: var(--accent-green);">Guia de Cristais</p>
+            </div>
+            <button id="theme-toggle" class="p-2 rounded-full focus:outline-none" style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                <i data-lucide="moon" class="dark:hidden w-5 h-5" style="color: var(--text-main);"></i>
+                <i data-lucide="sun" class="hidden dark:block w-5 h-5 text-yellow-500"></i>
+            </button>
         </header>
 
-        <!-- ABA: ESCANEAR CÂMERA -->
-        <div id="view-escanear" class="tab-content p-5 flex flex-col items-center">
-            <p class="text-sm text-gray-400 text-center mb-6">Aponte a câmera para o cristal e descubra sua essência mágica.</p>
+        <!-- ÁREA DE CONTEÚDO (Flex-1 para ocupar o meio, overflow-y-auto para rolar SÓ o que vazar aqui) -->
+        <div class="flex-1 overflow-y-auto no-scrollbar relative pb-20">
             
-            <div id="camera-container" class="w-full aspect-[3/4] bg-[#1e2621] rounded-2xl overflow-hidden relative border border-gray-700 flex flex-col items-center justify-center">
-                <i data-lucide="scan-line" class="w-12 h-12 text-gray-600 absolute"></i>
-                <div id="webcam-wrapper" class="absolute inset-0 z-10 hidden"></div>
-                
-                <!-- Animação de Carregamento (Magia 2 segundos) -->
-                <div id="loading-magic" class="absolute inset-0 z-20 hidden flex-col items-center justify-center bg-[#121815]/90 backdrop-blur-sm">
-                    <div class="magic-loader mb-4"></div>
-                    <p class="text-emerald-400 font-medium animate-pulse">Lendo energias...</p>
+            <!-- ABA: CRISTAL DO DIA (Temporário até a câmera chegar) -->
+            <div id="view-descobrir" class="tab-content h-full flex flex-col items-center justify-center p-6 fade-in">
+                <div class="text-center mb-8">
+                    <i data-lucide="leaf" class="w-12 h-12 mx-auto mb-4" style="color: var(--accent-green);"></i>
+                    <h2 class="text-xl font-bold mb-2">Qual energia você precisa hoje?</h2>
+                    <p class="text-sm text-center" style="color: var(--text-muted);">Sorteie uma pedra mágica para ser o seu guia energético nas próximas 24 horas.</p>
                 </div>
+                
+                <button id="btn-sortear" class="w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg transform active:scale-95 transition-transform flex items-center justify-center gap-2" style="background-color: var(--accent-green);">
+                    <i data-lucide="sparkles"></i> Revelar Meu Cristal
+                </button>
             </div>
 
-            <button id="btn-camera" class="mt-8 w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold text-lg shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2 transform active:scale-95 transition-transform">
-                <i data-lucide="camera"></i> Abrir Oráculo
+            <!-- ABA: PESQUISAR -->
+            <div id="view-pesquisar" class="tab-content hidden p-5 fade-in min-h-full">
+                <div class="relative mb-6 sticky top-0 z-10 pt-2 pb-4" style="background-color: var(--bg-color);">
+                    <i data-lucide="search" class="absolute left-4 top-5 w-5 h-5" style="color: var(--text-muted);"></i>
+                    <input type="text" id="search-input" placeholder="Buscar por nome ou energia..." class="w-full pl-12 pr-4 py-3 rounded-xl outline-none transition-colors" style="background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main);">
+                </div>
+                <div id="search-results" class="space-y-3 pb-6"></div>
+            </div>
+
+            <!-- ABA: SIGNOS -->
+            <div id="view-signos" class="tab-content hidden p-5 fade-in min-h-full">
+                <p class="text-sm mb-4 text-center" style="color: var(--text-muted);">Selecione seu signo solar ou ascendente</p>
+                <div id="signos-grid" class="grid grid-cols-3 gap-2 mb-6"></div>
+                <div id="signos-results" class="space-y-3 pb-6 border-t pt-4" style="border-color: var(--border-color);"></div>
+            </div>
+
+            <!-- ABA: CATÁLOGO -->
+            <div id="view-catalogo" class="tab-content hidden p-5 fade-in min-h-full">
+                <div id="catalogo-results" class="grid grid-cols-2 gap-4 pb-6"></div>
+            </div>
+
+        </div> <!-- Fim da área de conteúdo -->
+
+        <!-- NAVEGAÇÃO INFERIOR FIXA -->
+        <nav class="absolute bottom-0 w-full flex justify-between px-2 py-3 z-40 border-t" style="background-color: var(--bg-color); border-color: var(--border-color);">
+            <button class="nav-btn flex-1 flex flex-col items-center gap-1 active-tab" data-target="view-descobrir">
+                <i data-lucide="compass" class="w-6 h-6"></i>
+                <span class="text-[10px] uppercase font-bold tracking-wider">Guia</span>
             </button>
-            <p id="feedback-text" class="mt-4 text-sm text-center text-gray-400"></p>
-        </div>
+            <button class="nav-btn flex-1 flex flex-col items-center gap-1 opacity-50" data-target="view-pesquisar">
+                <i data-lucide="search" class="w-6 h-6"></i>
+                <span class="text-[10px] uppercase font-bold tracking-wider">Buscar</span>
+            </button>
+            <button class="nav-btn flex-1 flex flex-col items-center gap-1 opacity-50" data-target="view-signos">
+                <i data-lucide="stars" class="w-6 h-6"></i>
+                <span class="text-[10px] uppercase font-bold tracking-wider">Signos</span>
+            </button>
+            <button class="nav-btn flex-1 flex flex-col items-center gap-1 opacity-50" data-target="view-catalogo">
+                <i data-lucide="library" class="w-6 h-6"></i>
+                <span class="text-[10px] uppercase font-bold tracking-wider">Catálogo</span>
+            </button>
+        </nav>
 
-        <!-- ABA: PESQUISAR -->
-        <div id="view-pesquisar" class="tab-content hidden p-5">
-            <div class="relative mb-6">
-                <i data-lucide="search" class="absolute left-4 top-4 w-5 h-5 text-gray-500"></i>
-                <input type="text" id="search-input" placeholder="Buscar cristal ou energia..." class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[#1e2621] border border-gray-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white outline-none placeholder-gray-500">
-            </div>
-            <div id="search-results" class="space-y-3 pb-6"></div>
-        </div>
-
-        <!-- ABA: SIGNOS -->
-        <div id="view-signos" class="tab-content hidden p-5">
-            <p class="text-sm text-gray-400 mb-4">Qual é o seu signo solar ou ascendente?</p>
-            <div id="signos-grid" class="grid grid-cols-3 gap-3 mb-8"></div>
-            <div id="signos-results" class="space-y-3 pb-6"></div>
-        </div>
-
-        <!-- ABA: CATÁLOGO -->
-        <div id="view-catalogo" class="tab-content hidden p-5">
-            <div id="catalogo-results" class="grid grid-cols-2 gap-4 pb-6"></div>
-        </div>
-
-        <!-- MODAL: CARTA DO CRISTAL (O TAROT) -->
-        <div id="modal-card" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-            <div class="tarot-card relative w-full max-w-[360px] max-h-[90vh] rounded-2xl overflow-y-auto no-scrollbar flex flex-col">
-                <button id="close-modal" class="absolute top-4 right-4 p-2 bg-black/40 rounded-full text-white z-10 backdrop-blur-md">
+        <!-- MODAL: CARTA DO CRISTAL -->
+        <div id="modal-card" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+            <div class="crystal-card relative w-full max-w-[360px] max-h-[90vh] rounded-2xl overflow-y-auto no-scrollbar flex flex-col">
+                <button id="close-modal" class="absolute top-3 right-3 p-2 bg-black/30 rounded-full text-white z-10 hover:bg-black/50 transition-colors">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
                 <div id="modal-content"></div>
             </div>
         </div>
 
-        <!-- NAVEGAÇÃO INFERIOR -->
-        <nav class="fixed bottom-0 w-full max-w-md bg-[#121815]/95 backdrop-blur-lg border-t border-gray-800 flex justify-between px-2 py-3 z-40">
-            <button class="nav-btn flex-1 flex flex-col items-center gap-1 text-emerald-500" data-target="view-escanear">
-                <i data-lucide="scan" class="w-6 h-6"></i>
-                <span class="text-[10px] uppercase font-bold tracking-wider">Escanear</span>
-            </button>
-            <button class="nav-btn flex-1 flex flex-col items-center gap-1 text-gray-500" data-target="view-pesquisar">
-                <i data-lucide="search" class="w-6 h-6"></i>
-                <span class="text-[10px] uppercase font-bold tracking-wider">Buscar</span>
-            </button>
-            <button class="nav-btn flex-1 flex flex-col items-center gap-1 text-gray-500" data-target="view-signos">
-                <i data-lucide="sparkles" class="w-6 h-6"></i>
-                <span class="text-[10px] uppercase font-bold tracking-wider">Signos</span>
-            </button>
-            <button class="nav-btn flex-1 flex flex-col items-center gap-1 text-gray-500" data-target="view-catalogo">
-                <i data-lucide="book-open" class="w-6 h-6"></i>
-                <span class="text-[10px] uppercase font-bold tracking-wider">Catálogo</span>
-            </button>
-        </nav>
     </main>
 
     <script src="app.js"></script>
