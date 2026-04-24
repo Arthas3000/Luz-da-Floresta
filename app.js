@@ -18,7 +18,10 @@ const IMG_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://w
 document.addEventListener('DOMContentLoaded', async () => {
     lucide.createIcons();
     await carregarDados();
-    configurarTema();
+    
+    // Chamada comentada para forçar apenas o tema claro
+    // configurarTema(); 
+    
     configurarNavegacao();
     configurarFiltros();
     configurarAltar();
@@ -40,12 +43,17 @@ async function carregarDados() {
 // ==========================================
 // INTERFACE E COMPORTAMENTO
 // ==========================================
+
+/* 
+// Função de tema comentada para manter o app apenas no modo claro.
+// Descomente no futuro se quiser reativar a funcionalidade.
 function configurarTema() {
     const btn = document.getElementById('theme-toggle');
     const html = document.documentElement;
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) html.classList.add('dark');
     btn.addEventListener('click', () => html.classList.toggle('dark'));
 }
+*/
 
 function configurarNavegacao() {
     const botoes = document.querySelectorAll('.nav-btn');
@@ -75,8 +83,17 @@ function configurarNavegacao() {
 // ==========================================
 // HAPTICS (VIBRAÇÃO TÁTIL)
 // ==========================================
-function vibrarSuspense() {
-    if ("vibrate" in navigator) navigator.vibrate([20, 150, 30, 100, 50, 80, 80, 50, 150]);
+function vibrarCoracaoPanico() {
+    if ("vibrate" in navigator) {
+        // Padrão: [vibe, pausa, vibe, pausa...]
+        navigator.vibrate([
+            100, 500, 100, 800,  // Batida lenta inicial
+            100, 400, 100, 500,  // Começa a acelerar
+            150, 200, 150, 250,  // Ansiedade
+            200, 100, 200, 100,  // Pânico
+            500                  // O "choque" final
+        ]);
+    }
 }
 
 function vibrarImpacto() {
