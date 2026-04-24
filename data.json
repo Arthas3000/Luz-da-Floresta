@@ -1,7 +1,7 @@
 {
   "pirita": {
     "nome": "Pirita",
-    "imagem_url": "imagens/cristais/pirita.jpg",
+    "imagem_url": "imagens/cristais/pirita.jpeg",
     "signos": ["Leão", "Áries"],
     "chakra": "Plexo Solar",
     "energia": "Prosperidade, sucesso e escudo energético contra inveja.",
@@ -16,7 +16,7 @@
   },
    "turmalina-negra": {
     "nome": "Turmalina Negra",
-    "imagem_url": "imagens/cristais/turmalina_negra.jpg",
+    "imagem_url": "imagens/cristais/turmalina_negra.jpeg",
     "signos": ["Capricórnio", "Escorpião"],
     "chakra": "Básico",
     "energia": "Proteção pesada, limpeza espiritual e aterramento.",
@@ -31,7 +31,7 @@
   },
   "selenita": {
     "nome": "Selenita",
-    "imagem_url": "imagens/cristais/selenita.jpg",
+    "imagem_url": "imagens/cristais/selenita.jpeg",
     "signos": ["Câncer", "Touro"],
     "chakra": "Coronário e Transpessoal",
     "energia": "Limpeza espiritual de outros cristais e paz profunda.",
@@ -46,7 +46,7 @@
   },
   "cianita-azul": {
     "nome": "Cianita Azul",
-    "imagem_url": "imagens/cristais/cianita_azul.jpg",
+    "imagem_url": "imagens/cristais/cianita_azul.jpeg",
     "signos": ["Peixes", "Áries", "Sagitário"],
     "chakra": "Laríngeo e Frontal",
     "energia": "Proteção divina e corte de cordões energéticos negativos.",
@@ -62,7 +62,7 @@
 
 "cristal-de-quartzo": {
     "nome": "Cristal de Quartzo (Quartzo Hialino)",
-    "imagem_url": "imagens/cristais/cristal.jpg",
+    "imagem_url": "imagens/cristais/cristal.jpeg",
     "signos": ["Todos os signos"],
     "chakra": "Todos (especialmente o Coronário)",
     "energia": "Amplificação de energia, purificação e clareza mental.",
@@ -74,5 +74,4 @@
       "energizacao": "Luz solar (por ser muito resistente) ou luz lunar.",
       "combinacao": "Qualquer outra pedra, pois ele atua como um amplificador natural."
     }
-  }
-}
+  },}
