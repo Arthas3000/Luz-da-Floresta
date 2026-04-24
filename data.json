@@ -1,8 +1,8 @@
 {
   "ametista": {
     "nome": "Ametista",
-    "search_term": "amethyst crystal",
-    "signos":["Aquário", "Peixes", "Sagitário"],
+    "imagem_url": "imagens/cristais/ametista.jpg",
+    "signos": ["Aquário", "Peixes", "Sagitário"],
     "chakra": "Frontal e Coronário",
     "energia": "Transmutação, intuição e calma mental. Afasta a negatividade.",
     "sugestao_uso": "Use como colar na altura do peito ou deixe no quarto para melhorar o sono.",
@@ -16,7 +16,7 @@
   },
   "pirita": {
     "nome": "Pirita",
-    "search_term": "pyrite crystal",
+    "imagem_url": "imagens/cristais/pirita.jpg",
     "signos": ["Leão", "Áries"],
     "chakra": "Plexo Solar",
     "energia": "Prosperidade, sucesso e escudo energético contra inveja.",
@@ -31,8 +31,8 @@
   },
   "quartzo-rosa": {
     "nome": "Quartzo Rosa",
-    "search_term": "rose quartz crystal",
-    "signos":["Touro", "Libra"],
+    "imagem_url": "imagens/cristais/quartzo_rosa.jpg",
+    "signos": ["Touro", "Libra"],
     "chakra": "Cardíaco",
     "energia": "Amor incondicional, paz infinita e cura emocional.",
     "sugestao_uso": "Use próximo ao coração para atrair harmonia em relacionamentos.",
@@ -46,7 +46,7 @@
   },
   "turmalina-negra": {
     "nome": "Turmalina Negra",
-    "search_term": "black tourmaline crystal",
+    "imagem_url": "imagens/cristais/turmalina_negra.jpg",
     "signos": ["Capricórnio", "Escorpião"],
     "chakra": "Básico",
     "energia": "Proteção pesada, limpeza espiritual e aterramento.",
@@ -61,7 +61,7 @@
   },
   "citrino": {
     "nome": "Citrino",
-    "search_term": "citrine crystal",
+    "imagem_url": "imagens/cristais/citrino.jpg",
     "signos": ["Gêmeos", "Leão", "Virgem"],
     "chakra": "Plexo Solar",
     "energia": "Abundância, alegria de viver e autoconfiança.",
@@ -76,7 +76,7 @@
   },
   "olho-de-tigre": {
     "nome": "Olho de Tigre",
-    "search_term": "tiger eye crystal",
+    "imagem_url": "imagens/cristais/olho_de_tigre.jpg",
     "signos": ["Gêmeos", "Leão"],
     "chakra": "Plexo Solar e Básico",
     "energia": "Coragem, proteção contra mau-olhado e foco.",
@@ -91,7 +91,7 @@
   },
   "selenita": {
     "nome": "Selenita",
-    "search_term": "selenite crystal",
+    "imagem_url": "imagens/cristais/selenita.jpg",
     "signos": ["Câncer", "Touro"],
     "chakra": "Coronário e Transpessoal",
     "energia": "Limpeza espiritual de outros cristais e paz profunda.",
@@ -106,8 +106,8 @@
   },
   "lapislazuli": {
     "nome": "Lápis Lazúli",
-    "search_term": "lapis lazuli crystal",
-    "signos":["Sagitário", "Aquário"],
+    "imagem_url": "imagens/cristais/lapis_lazuli.jpg",
+    "signos": ["Sagitário", "Aquário"],
     "chakra": "Frontal e Laríngeo",
     "energia": "Verdade, comunicação espiritual e sabedoria.",
     "sugestao_uso": "Use como colar curto para estimular a glândula tireoide.",
@@ -121,7 +121,7 @@
   },
   "cianita-azul": {
     "nome": "Cianita Azul",
-    "search_term": "blue kyanite crystal",
+    "imagem_url": "imagens/cristais/cianita_azul.jpg",
     "signos": ["Peixes", "Áries", "Sagitário"],
     "chakra": "Laríngeo e Frontal",
     "energia": "Proteção divina e corte de cordões energéticos negativos.",
@@ -136,8 +136,8 @@
   },
   "pedra-da-lua": {
     "nome": "Pedra da Lua",
-    "search_term": "moonstone crystal",
-    "signos":["Câncer", "Escorpião", "Peixes"],
+    "imagem_url": "imagens/cristais/pedra_da_lua.jpg",
+    "signos": ["Câncer", "Escorpião", "Peixes"],
     "chakra": "Sacral e Coronário",
     "energia": "Intuição feminina, equilíbrio emocional e fertilidade.",
     "sugestao_uso": "Coloque sob o travesseiro para sonhos lúcidos.",
@@ -151,8 +151,8 @@
   },
   "hematita": {
     "nome": "Hematita",
-    "search_term": "hematite stone",
-    "signos":["Áries", "Escorpião"],
+    "imagem_url": "imagens/cristais/hematita.jpg",
+    "signos": ["Áries", "Escorpião"],
     "chakra": "Básico",
     "energia": "Dissipação de negatividade e fortalecimento do sangue.",
     "sugestao_uso": "Use no tornozelo ou pulseira para aterramento.",
@@ -166,7 +166,7 @@
   },
   "quartzo-verde": {
     "nome": "Quartzo Verde",
-    "search_term": "green aventurine crystal",
+    "imagem_url": "imagens/cristais/quartzo_verde.jpg",
     "signos": ["Virgem", "Câncer"],
     "chakra": "Cardíaco",
     "energia": "Saúde física, vitalidade e esperança.",
@@ -181,7 +181,7 @@
   },
   "sodalita": {
     "nome": "Sodalita",
-    "search_term": "sodalite crystal",
+    "imagem_url": "imagens/cristais/sodalita.jpg",
     "signos": ["Sagitário", "Virgem"],
     "chakra": "Frontal",
     "energia": "Lógica, racionalidade e harmonia em grupos.",
@@ -196,8 +196,8 @@
   },
   "fluorita": {
     "nome": "Fluorita",
-    "search_term": "fluorite crystal",
-    "signos":["Peixes", "Capricórnio"],
+    "imagem_url": "imagens/cristais/fluorita.jpg",
+    "signos": ["Peixes", "Capricórnio"],
     "chakra": "Frontal e Coronário",
     "energia": "Organização mental, foco e absorção de novos conhecimentos.",
     "sugestao_uso": "Deixe sobre livros ou onde você estuda.",
@@ -211,7 +211,7 @@
   },
   "malaquita": {
     "nome": "Malaquita",
-    "search_term": "malachite crystal",
+    "imagem_url": "imagens/cristais/malaquita.jpg",
     "signos": ["Escorpião", "Touro"],
     "chakra": "Cardíaco",
     "energia": "Transformação profunda e liberação de traumas.",
@@ -226,8 +226,8 @@
   },
   "labradorita": {
     "nome": "Labradorita",
-    "search_term": "labradorite crystal",
-    "signos":["Sagitário", "Peixes", "Escorpião"],
+    "imagem_url": "imagens/cristais/labradorita.jpg",
+    "signos": ["Sagitário", "Peixes", "Escorpião"],
     "chakra": "Terceiro Olho",
     "energia": "Magia, expansão da consciência e proteção da aura.",
     "sugestao_uso": "Segure durante a meditação para acessar visões.",
@@ -241,8 +241,8 @@
   },
   "obsidiana-negra": {
     "nome": "Obsidiana Negra",
-    "search_term": "black obsidian crystal",
-    "signos":["Escorpião", "Capricórnio"],
+    "imagem_url": "imagens/cristais/obsidiana_negra.jpg",
+    "signos": ["Escorpião", "Capricórnio"],
     "chakra": "Básico",
     "energia": "Verdade nua e crua, proteção contra o ego e sombras.",
     "sugestao_uso": "Use com cautela para autoconhecimento profundo.",
@@ -256,8 +256,8 @@
   },
   "granada": {
     "nome": "Granada",
-    "search_term": "garnet crystal",
-    "signos":["Áries", "Leão", "Escorpião"],
+    "imagem_url": "imagens/cristais/granada.jpg",
+    "signos": ["Áries", "Leão", "Escorpião"],
     "chakra": "Básico",
     "energia": "Paixão, coragem e disposição física.",
     "sugestao_uso": "Use quando se sentir apático ou sem energia.",
@@ -271,7 +271,7 @@
   },
   "amazonita": {
     "nome": "Amazonita",
-    "search_term": "amazonite crystal",
+    "imagem_url": "imagens/cristais/amazonita.jpg",
     "signos": ["Virgem", "Aquário"],
     "chakra": "Laríngeo",
     "energia": "Calma, suavidade e proteção contra poluição eletromagnética.",
@@ -286,7 +286,7 @@
   },
   "jaspe-vermelho": {
     "nome": "Jaspe Vermelho",
-    "search_term": "red jasper crystal",
+    "imagem_url": "imagens/cristais/jaspe_vermelho.jpg",
     "signos": ["Áries", "Touro"],
     "chakra": "Básico",
     "energia": "Aterramento, força de vontade e justiça.",
@@ -301,8 +301,8 @@
   },
   "jadeite": {
     "nome": "Jade",
-    "search_term": "green jade crystal",
-    "signos":["Libra", "Virgem", "Touro"],
+    "imagem_url": "imagens/cristais/jadeite.jpg",
+    "signos": ["Libra", "Virgem", "Touro"],
     "chakra": "Cardíaco",
     "energia": "Pureza, serenidade e boa sorte.",
     "sugestao_uso": "Use como amuleto de longevidade e prosperidade.",
@@ -316,7 +316,7 @@
   },
   "lepidolita": {
     "nome": "Lepidolita",
-    "search_term": "lepidolite crystal",
+    "imagem_url": "imagens/cristais/lepidolita.jpg",
     "signos": ["Libra", "Peixes"],
     "chakra": "Terceiro Olho e Cardíaco",
     "energia": "Alívio de ansiedade e transição suave.",
@@ -331,7 +331,7 @@
   },
   "calcita-laranja": {
     "nome": "Calcita Laranja",
-    "search_term": "orange calcite crystal",
+    "imagem_url": "imagens/cristais/calcita_laranja.jpg",
     "signos": ["Leão", "Gêmeos"],
     "chakra": "Sacral",
     "energia": "Criatividade, sexualidade saudável e entusiasmo.",

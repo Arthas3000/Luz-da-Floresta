@@ -2,14 +2,15 @@
 // CONFIGURAÇÕES GLOBAIS
 // ==========================================
 const LINK_LOJA = "https://wa.me/5511999999999?text=Olá, quero saber sobre a pedra ";
-const UNSPLASH_KEY = 'Rfa-CtszQ8Pu8Minw38B_zQdRmylpL_FMncicpwTpCU'; // 🔴 Insira sua chave da API aqui
 
 let bancoDeDados = {};
 let meuAltar = JSON.parse(localStorage.getItem('altarLuzFloresta')) || { colecao: [], desejo:[] };
-const imageCache = {}; // Cache de imagens na sessão para poupar requisições à API
 
 const signosZodiaco =['Áries', 'Touro', 'Gêmeos', 'Câncer', 'Leão', 'Virgem', 'Libra', 'Escorpião', 'Sagitário', 'Capricórnio', 'Aquário', 'Peixes'];
 const chakrasLista =['Básico', 'Sacral', 'Plexo Solar', 'Cardíaco', 'Laríngeo', 'Frontal', 'Coronário'];
+
+// Imagem genérica para caso falte a foto de alguma pedra na pasta
+const IMG_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 24 24' fill='none' stroke='%238B7355' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='12 2 2 7 12 12 22 7 12 2'/%3E%3Cpolyline points='2 17 12 22 22 17'/%3E%3Cpolyline points='2 12 12 17 22 12'/%3E%3C/svg%3E";
 
 // ==========================================
 // INICIALIZAÇÃO DO APP
@@ -31,34 +32,8 @@ async function carregarDados() {
     try {
         const response = await fetch('data.json');
         bancoDeDados = await response.json();
-    } catch (error) { console.error("Erro ao carregar o banco de dados", error); }
-}
-
-// ==========================================
-// INTEGRAÇÃO UNSPLASH API
-// ==========================================
-async function buscarImagemUnsplash(termo) {
-    if (imageCache[termo]) return imageCache[termo]; // Retorna do cache se existir
-    
-    try {
-        const response = await fetch(`https://api.unsplash.com/search/photos?query=${termo}&client_id=${UNSPLASH_KEY}&per_page=1&orientation=squarish`);
-        const data = await response.json();
-        
-        const info = {
-            url: data.results[0]?.urls.regular || 'https://images.unsplash.com/photo-1590795431604-94c6cb7e9895?w=500&auto=format',
-            autor: data.results[0]?.user.name || 'Unsplash',
-            linkAutor: data.results[0]?.user.links.html || '#'
-        };
-        
-        imageCache[termo] = info;
-        return info;
-    } catch (e) {
-        console.error("Erro ao buscar imagem no Unsplash:", e);
-        return { 
-            url: 'https://images.unsplash.com/photo-1590795431604-94c6cb7e9895?w=500&auto=format', 
-            autor: 'Desconhecido', 
-            linkAutor: '#' 
-        };
+    } catch (error) { 
+        console.error("Erro ao carregar o banco de dados", error); 
     }
 }
 
@@ -163,9 +138,9 @@ function atualizarAbaAltar() {
 }
 
 // ==========================================
-// RENDERIZAÇÃO DO CARD E LISTAS (Assíncrono)
+// RENDERIZAÇÃO DO CARD E LISTAS (Sincrono Local)
 // ==========================================
-async function abrirCard(idCristal) {
+function abrirCard(idCristal) {
     const pedra = bancoDeDados[idCristal];
     if (!pedra) return;
 
@@ -173,20 +148,16 @@ async function abrirCard(idCristal) {
     const cardContainer = document.getElementById('card-container');
     const content = document.getElementById('modal-content');
 
-    // Busca a imagem no Unsplash
-    const imgInfo = await buscarImagemUnsplash(pedra.search_term);
-
     const taNaColecao = meuAltar.colecao.includes(idCristal);
     const taNoDesejo = meuAltar.desejo.includes(idCristal);
 
     const btnColecaoClass = taNaColecao ? "bg-emerald-600 text-white border-transparent" : "bg-transparent border-gray-400 text-gray-500 dark:text-gray-400";
     const btnDesejoClass = taNoDesejo ? "bg-purple-600 text-white border-transparent" : "bg-transparent border-gray-400 text-gray-500 dark:text-gray-400";
 
+    const imgSrc = pedra.imagem_url || IMG_PLACEHOLDER;
+
     content.innerHTML = `
-        <div class="h-60 w-full bg-cover bg-center rounded-t-2xl relative" style="background-image: url('${imgInfo.url}')">
-            <div class="absolute bottom-2 right-2 bg-black/60 text-[9px] text-gray-200 px-2 py-1 rounded backdrop-blur-sm">
-                Foto por <a href="${imgInfo.linkAutor}" target="_blank" class="underline text-white">${imgInfo.autor}</a>
-            </div>
+        <div class="h-60 w-full bg-cover bg-center rounded-t-2xl relative bg-gray-100 dark:bg-gray-800" style="background-image: url('${imgSrc}')">
         </div>
         <div class="p-5 pb-6">
             <h2 class="text-3xl font-serif font-bold mb-1" style="color: var(--text-main);">${pedra.nome}</h2>
@@ -214,9 +185,9 @@ async function abrirCard(idCristal) {
                         Como Cuidar <i data-lucide="chevron-down" class="w-4 h-4 group-open:rotate-180 transition-transform text-emerald-600"></i>
                     </summary>
                     <div class="pt-3 mt-3 border-t space-y-3 text-xs leading-relaxed" style="border-color: var(--border-color);">
-                        <p><strong style="color: var(--accent-green);">Limpeza:</strong> ${pedra.cuidados?.limpeza}</p>
-                        <p><strong style="color: var(--accent-green);">Energização:</strong> ${pedra.cuidados?.energizacao}</p>
-                        <p><strong style="color: var(--accent-green);">Combinar com:</strong> ${pedra.cuidados?.combinacao}</p>
+                        <p><strong style="color: var(--accent-green);">Limpeza:</strong> ${pedra.cuidados?.limpeza || "Informação não disponível."}</p>
+                        <p><strong style="color: var(--accent-green);">Energização:</strong> ${pedra.cuidados?.energizacao || "Informação não disponível."}</p>
+                        <p><strong style="color: var(--accent-green);">Combinar com:</strong> ${pedra.cuidados?.combinacao || "Informação não disponível."}</p>
                     </div>
                 </details>
 
@@ -246,53 +217,43 @@ function fecharCard() {
     setTimeout(() => modal.classList.add('hidden'), 300);
 }
 
-// Gera a lista (Agora suporta a lógica assíncrona do Unsplash)
-async function gerarHTMLLista(arrayIds, containerId, formatoGrid = false, msgVazio = "Nenhum cristal encontrado.") {
+function gerarHTMLLista(arrayIds, containerId, formatoGrid = false, msgVazio = "Nenhum cristal encontrado.") {
     const container = document.getElementById(containerId);
+    container.innerHTML = '';
     
-    // Mostra estado de loading leve
-    container.innerHTML = `<div class="col-span-2 flex justify-center py-8"><i data-lucide="loader-2" class="animate-spin text-emerald-500 w-6 h-6"></i></div>`;
-    lucide.createIcons();
-
     if(arrayIds.length === 0) {
         container.innerHTML = `<p class="text-center py-4 col-span-2 text-sm" style="color: var(--text-muted);">${msgVazio}</p>`;
         return;
     }
 
-    // Armazena HTML em uma string antes de injetar na DOM para evitar re-renders lentos
-    let blocosHTML = document.createElement('div');
-    blocosHTML.className = formatoGrid ? "grid grid-cols-2 gap-4 w-full col-span-2" : "space-y-3 w-full";
-
-    for (const id of arrayIds) {
+    arrayIds.forEach(id => {
         const p = bancoDeDados[id];
-        const imgInfo = await buscarImagemUnsplash(p.search_term);
         const card = document.createElement('div');
+        const imgSrc = p.imagem_url || IMG_PLACEHOLDER;
         
         if(formatoGrid) {
             card.className = "crystal-card rounded-xl overflow-hidden cursor-pointer active:scale-95 transition-transform flex flex-col";
             card.innerHTML = `
-                <div class="h-32 bg-cover bg-center border-b relative" style="background-image: url('${imgInfo.url}'); border-color: var(--border-color);">
+                <div class="h-32 bg-cover bg-center border-b relative bg-gray-100 dark:bg-gray-800" style="background-image: url('${imgSrc}'); border-color: var(--border-color);">
                     ${meuAltar.colecao.includes(id) ? '<i data-lucide="check-circle" class="absolute top-2 right-2 text-emerald-500 bg-white dark:bg-gray-900 rounded-full w-5 h-5 shadow-sm"></i>' : ''}
                     ${meuAltar.desejo.includes(id) ? '<i data-lucide="heart" class="absolute top-2 right-2 text-purple-500 bg-white dark:bg-gray-900 rounded-full w-5 h-5 shadow-sm"></i>' : ''}
                 </div>
-                <p class="p-3 text-center font-bold text-sm" style="color: var(--text-main);">${p.nome}</p>
+                <p class="p-3 text-center font-bold text-sm truncate w-full px-2" style="color: var(--text-main);">${p.nome}</p>
             `;
         } else {
             card.className = "crystal-card flex items-center gap-4 p-2 rounded-xl cursor-pointer active:scale-95 transition-transform";
             card.innerHTML = `
-                <div class="h-16 w-16 rounded-lg bg-cover bg-center flex-shrink-0" style="background-image: url('${imgInfo.url}')"></div>
-                <div class="flex-1 pr-2">
-                    <h4 class="font-bold text-sm" style="color: var(--text-main);">${p.nome}</h4>
-                    <p class="text-xs truncate w-[200px]" style="color: var(--text-muted);">${p.energia}</p>
+                <div class="h-16 w-16 rounded-lg bg-cover bg-center flex-shrink-0 bg-gray-100 dark:bg-gray-800" style="background-image: url('${imgSrc}')"></div>
+                <div class="flex-1 pr-2 min-w-0">
+                    <h4 class="font-bold text-sm truncate" style="color: var(--text-main);">${p.nome}</h4>
+                    <p class="text-xs truncate w-full" style="color: var(--text-muted);">${p.energia}</p>
                 </div>
             `;
         }
         card.onclick = () => abrirCard(id);
-        blocosHTML.appendChild(card);
-    }
+        container.appendChild(card);
+    });
     
-    container.innerHTML = '';
-    container.appendChild(blocosHTML);
     lucide.createIcons();
 }
 
@@ -310,7 +271,6 @@ function configurarFiltros() {
     const contSignos = document.getElementById('signos-container');
     const contChakras = document.getElementById('chakras-container');
 
-    // Busca de Texto Dinâmica
     input.addEventListener('input', (e) => {
         const termo = e.target.value.toLowerCase();
         if(termo === '') {
@@ -324,7 +284,6 @@ function configurarFiltros() {
         gerarHTMLLista(filtrados, 'explorar-results', false);
     });
 
-    // Alterna visualização Signos / Chakras
     btnSignos.onclick = () => {
         contSignos.classList.remove('hidden');
         contChakras.classList.add('hidden');
@@ -339,7 +298,6 @@ function configurarFiltros() {
         btnSignos.style.borderColor = 'var(--border-color)'; btnSignos.style.color = 'var(--text-muted)';
     };
 
-    // Renderiza botões de Signos
     const gridSignos = document.getElementById('signos-grid');
     signosZodiaco.forEach(signo => {
         const btn = document.createElement('button');
@@ -358,7 +316,6 @@ function configurarFiltros() {
         gridSignos.appendChild(btn);
     });
 
-    // Renderiza botões de Chakras
     const gridChakras = document.getElementById('chakras-grid');
     chakrasLista.forEach(chakra => {
         const btn = document.createElement('button');
@@ -402,13 +359,13 @@ function configurarSorteioDia() {
 }
 
 // ==========================================
-// REGISTRO DO SERVICE WORKER (Para virar App PWA offline)
+// REGISTRO DO SERVICE WORKER (PWA offline)
 // ==========================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
             .then(registration => {
-                console.log('App da Floresta Mágica instalado com sucesso!', registration.scope);
+                console.log('App instalado com sucesso no Service Worker!');
             })
             .catch(err => {
                 console.error('Falha ao instalar o Service Worker:', err);
