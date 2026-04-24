@@ -83,17 +83,8 @@ function configurarNavegacao() {
 // ==========================================
 // HAPTICS (VIBRAÇÃO TÁTIL)
 // ==========================================
-function vibrarCoracaoPanico() {
-    if ("vibrate" in navigator) {
-        // Padrão: [vibe, pausa, vibe, pausa...]
-        navigator.vibrate([
-            100, 500, 100, 800,  // Batida lenta inicial
-            100, 400, 100, 500,  // Começa a acelerar
-            150, 200, 150, 250,  // Ansiedade
-            200, 100, 200, 100,  // Pânico
-            500                  // O "choque" final
-        ]);
-    }
+function vibrarSuspense() {
+    if ("vibrate" in navigator) navigator.vibrate([100, 500, 100, 800, 100, 400, 100, 500, 150, 200, 150, 250, 200, 100, 200, 100, 500]);
 }
 
 function vibrarImpacto() {
