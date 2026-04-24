@@ -1,20 +1,18 @@
 /* Paleta inspirada na logo Luz da Floresta */
 :root {
-  /* Light Mode (Tons terrosos e naturais) */
-  --bg-color: #FAFAF7; /* Off-white com leve tom creme */
-  --text-main: #4A3525; /* Marrom escuro da logo */
-  --text-muted: #8B7355; /* Marrom claro */
-  --accent-green: #2E7D32; /* Verde da folha da logo */
+  --bg-color: #FAFAF7;
+  --text-main: #4A3525;
+  --text-muted: #8B7355;
+  --accent-green: #2E7D32;
   --card-bg: #FFFFFF;
   --border-color: #E6E0D4;
 }
 
-/* Dark Mode (Aconchegante como a noite na floresta) */
 .dark {
-  --bg-color: #1A1A17; /* Cinza super escuro, quase marrom/musgo */
-  --text-main: #F0EAD6; /* Creme claro para leitura */
+  --bg-color: #1A1A17;
+  --text-main: #F0EAD6;
   --text-muted: #A39B8B;
-  --accent-green: #4CAF50; /* Verde mais vibrante para contraste */
+  --accent-green: #4CAF50;
   --card-bg: #242421;
   --border-color: #383833;
 }
@@ -26,21 +24,34 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* Utilitários para ocultar scrollbar visualmente, mas permitir o scroll mecânico */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Animação suave para troca de abas e modais */
 .fade-in { animation: fadeIn 0.3s ease-in-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Estilo do Card do Cristal */
+/* Animação para quando o cristal é revelado (Impacto na mesa) */
+.drop-in { animation: dropIn 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+@keyframes dropIn { 
+  0% { opacity: 0; transform: scale(1.1) translateY(-20px); } 
+  70% { transform: scale(0.98) translateY(2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); } 
+}
+
 .crystal-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
-.dark .crystal-card {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+.dark .crystal-card { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+
+/* Estilização para o <details> (Sanfona de Cuidados) */
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+
+/* Adicione isso ao final do seu style.css */
+.crystal-card .h-28, .crystal-card .h-56 {
+    background-color: var(--border-color); /* Cor de fundo enquanto carrega */
+    background-blend-mode: multiply;
 }

@@ -1,0 +1,24 @@
+{
+  "name": "Luz da Floresta - Guia de Cristais",
+  "short_name": "Luz da Floresta",
+  "description": "Seu guia místico de cristais e oráculo energético.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FAFAF7",
+  "theme_color": "#2E7D32",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
