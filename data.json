@@ -1,78 +1,83 @@
+--- START OF FILE data.json ---
 {
-  "pirita": {
-    "nome": "Pirita",
-    "imagem_url": "imagens/cristais/pirita.jpeg",
-    "signos": ["Leão", "Áries"],
-    "chakra": "Plexo Solar",
-    "energia": "Prosperidade, sucesso e escudo energético contra inveja.",
-    "sugestao_uso": "Mantenha na sua mesa de trabalho ou junto com dinheiro na carteira.",
-    "origem": "Peru, Espanha e EUA.",
-    "geologia": "Sulfeto de ferro, conhecida como 'Ouro dos Tolos'.",
-    "cuidados": {
-      "limpeza": "NÃO use água (ela enferruja). Limpe apenas com fumaça de incenso ou selenita.",
-      "energizacao": "Deixe sob o sol da manhã por cerca de 1 a 2 horas.",
-      "combinacao": "Combine com Citrino e Olho de Tigre para um poderoso ímã de prosperidade."
+  "cristais": {
+    "ametista": {
+      "nome": "Ametista",
+      "tipo": "cristal",
+      "imagem_url": "imagens/cristais/ametista.jpg",
+      "tags": ["ansiedade", "dor de cabeça", "insônia", "intuição", "calma", "paz"],
+      "chakra": "Frontal e Coronário",
+      "energia": "Transmutação, intuição e calma mental. Afasta a negatividade.",
+      "origem": "Brasil (RS) e Uruguai.",
+      "geologia": "Variedade roxa do quartzo, formada em cavidades vulcânicas.",
+      "cuidados": {
+        "limpeza": "Lave em água corrente. Pode usar fumaça de incenso (Palo Santo ou Sálvia).",
+        "energizacao": "Luz do luar. Evite a luz solar direta.",
+        "combinacao": "Use com Quartzo Rosa para amor e paz profunda."
+      },
+      "sinergia": "lavanda"
+    },
+    "turmalina-negra": {
+      "nome": "Turmalina Negra",
+      "tipo": "cristal",
+      "imagem_url": "imagens/cristais/turmalina_negra.jpg",
+      "tags": ["proteção", "inveja", "peso", "aterramento", "medo"],
+      "chakra": "Básico",
+      "energia": "Proteção pesada, limpeza espiritual e aterramento.",
+      "origem": "Brasil, África e EUA.",
+      "geologia": "Ciclossilicato complexo de boro e alumínio.",
+      "cuidados": {
+        "limpeza": "Água corrente e sal grosso. É uma das poucas que aguenta bem o sal.",
+        "energizacao": "Luz solar por 30 minutos para carga rápida.",
+        "combinacao": "Selenita para limpeza contínua ou Quartzo Transparente."
+      },
+      "sinergia": "arruda"
+    },
+    "citrino": {
+      "nome": "Citrino",
+      "tipo": "cristal",
+      "imagem_url": "imagens/cristais/citrino.jpg",
+      "tags": ["prosperidade", "alegria", "foco", "energia", "cansaço"],
+      "chakra": "Plexo Solar",
+      "energia": "Abundância, alegria de viver e autoconfiança.",
+      "origem": "Brasil e Madagascar.",
+      "geologia": "Variedade amarela do quartzo, cor dada pelo ferro.",
+      "cuidados": {
+        "limpeza": "Raramente precisa de limpeza, mas pode ser lavado em água corrente.",
+        "energizacao": "Sol da manhã (não excessivo para não clarear).",
+        "combinacao": "Pirita para dinheiro ou Olho de Tigre para poder pessoal."
+      },
+      "sinergia": "canela"
     }
   },
-   "turmalina-negra": {
-    "nome": "Turmalina Negra",
-    "imagem_url": "imagens/cristais/turmalina_negra.jpeg",
-    "signos": ["Capricórnio", "Escorpião"],
-    "chakra": "Básico",
-    "energia": "Proteção pesada, limpeza espiritual e aterramento.",
-    "sugestao_uso": "Coloque na porta de entrada da casa ou carregue no bolso esquerdo.",
-    "origem": "Brasil, África e EUA.",
-    "geologia": "Ciclossilicato complexo de boro e alumínio.",
-    "cuidados": {
-      "limpeza": "Água corrente e sal grosso. É uma das poucas que aguenta bem o sal.",
-      "energizacao": "Luz solar por 30 minutos para carga rápida.",
-      "combinacao": "Selenita para limpeza contínua ou Quartzo Transparente."
-    }
-  },
-  "selenita": {
-    "nome": "Selenita",
-    "imagem_url": "imagens/cristais/selenita.jpeg",
-    "signos": ["Câncer", "Touro"],
-    "chakra": "Coronário e Transpessoal",
-    "energia": "Limpeza espiritual de outros cristais e paz profunda.",
-    "sugestao_uso": "Deixe outras pedras em cima dela para limpá-las automaticamente.",
-    "origem": "México, Marrocos e Brasil.",
-    "geologia": "Variedade fibrosa de gesso (Sulfato de Cálcio).",
-    "cuidados": {
-      "limpeza": "NUNCA molhe (ela dissolve). Use apenas sopro ou pincel seco.",
-      "energizacao": "Luz do luar. Ela se auto-energiza.",
-      "combinacao": "Turmalina Negra para equilíbrio luz/sombra."
-    }
-  },
-  "cianita-azul": {
-    "nome": "Cianita Azul",
-    "imagem_url": "imagens/cristais/cianita_azul.jpeg",
-    "signos": ["Peixes", "Áries", "Sagitário"],
-    "chakra": "Laríngeo e Frontal",
-    "energia": "Proteção divina e corte de cordões energéticos negativos.",
-    "sugestao_uso": "Passe ao redor do corpo para 'cortar' energias ruins.",
-    "origem": "Brasil e EUA.",
-    "geologia": "Silicato de alumínio com cristais estriados.",
-    "cuidados": {
-      "limpeza": "Não precisa ser limpa energeticamente, mas evite água em excesso.",
-      "energizacao": "Lua ou apenas intenção.",
-      "combinacao": "Cianita Preta para limpeza pesada."
-    }
-  },
-
-"cristal-de-quartzo": {
-    "nome": "Cristal de Quartzo (Quartzo Hialino)",
-    "imagem_url": "imagens/cristais/cristal.jpeg",
-    "signos": ["Todos os signos"],
-    "chakra": "Todos (especialmente o Coronário)",
-    "energia": "Amplificação de energia, purificação e clareza mental.",
-    "sugestao_uso": "Use junto com outras pedras para potencializar o efeito delas ou para meditação.",
-    "origem": "Brasil, Madagascar e EUA.",
-    "geologia": "Dióxido de silício com sistema cristalino trigonal e transparência vítrea.",
-    "cuidados": {
-      "limpeza": "Pode ser lavado em água corrente com sal grosso ou chuva.",
-      "energizacao": "Luz solar (por ser muito resistente) ou luz lunar.",
-      "combinacao": "Qualquer outra pedra, pois ele atua como um amplificador natural."
+  "incensos": {
+    "lavanda": {
+      "nome": "Incenso de Lavanda",
+      "tipo": "incenso",
+      "imagem_url": "imagens/incensos/lavanda.jpg",
+      "tags": ["estresse", "insônia", "dor de cabeça", "relaxamento", "calma"],
+      "energia": "Purifica o ambiente e acalma pensamentos acelerados. Traz relaxamento profundo.",
+      "como_usar": "Acenda no quarto 30 minutos antes de dormir ou durante momentos de tensão.",
+      "sinergia": "ametista"
+    },
+    "arruda": {
+      "nome": "Incenso de Arruda",
+      "tipo": "incenso",
+      "imagem_url": "imagens/incensos/arruda.jpg",
+      "tags": ["proteção", "limpeza", "inveja", "mau olhado", "peso no ambiente"],
+      "energia": "Forte descarrego energético. Quebra miasmas e energias densas paradas no ambiente.",
+      "como_usar": "Passe a fumaça pelos cantos da casa, de dentro para fora, focando nas portas e janelas.",
+      "sinergia": "turmalina-negra"
+    },
+    "canela": {
+      "nome": "Incenso de Canela",
+      "tipo": "incenso",
+      "imagem_url": "imagens/incensos/canela.jpg",
+      "tags": ["prosperidade", "energia", "desânimo", "foco", "ação"],
+      "energia": "Acelerador vibracional. Traz calor humano, atrai sucesso financeiro e espanta o desânimo.",
+      "como_usar": "Acenda no seu escritório ou local de trabalho. Sopre a fumaça de fora para dentro na porta de entrada.",
+      "sinergia": "citrino"
     }
   }
 }
+--- END OF FILE data.json ---

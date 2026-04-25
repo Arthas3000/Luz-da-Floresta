@@ -1,57 +1,104 @@
-/* Paleta inspirada na logo Luz da Floresta */
+--- START OF FILE style.css ---
+/* ==========================================
+   TEMA MÍSTICO LUZ DA FLORESTA
+   ========================================== */
 :root {
-  --bg-color: #FAFAF7;
-  --text-main: #4A3525;
-  --text-muted: #8B7355;
-  --accent-green: #2E7D32;
-  --card-bg: #FFFFFF;
-  --border-color: #E6E0D4;
-}
-
-.dark {
-  --bg-color: #1A1A17;
-  --text-main: #F0EAD6;
-  --text-muted: #A39B8B;
-  --accent-green: #4CAF50;
-  --card-bg: #242421;
-  --border-color: #383833;
+    --bg-color: #FDFBF7; /* Papel antigo/creme */
+    --text-main: #3E2723; /* Marrom escuro orgânico */
+    --text-muted: #795548; /* Marrom médio */
+    --accent-green: #2E4F2B; /* Verde Musgo/Floresta */
+    --gold: #C0A062; /* Dourado envelhecido */
+    --card-bg: #FFFFFF;
+    --border-color: #E6E0D4;
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  font-family: 'Inter', sans-serif;
-  transition: background-color 0.3s, color 0.3s;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Inter', serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-.fade-in { animation: fadeIn 0.3s ease-in-out; }
+/* Animações de Entrada */
+.fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Animação para quando o cristal é revelado (Impacto na mesa) */
-.drop-in { animation: dropIn 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-@keyframes dropIn { 
-  0% { opacity: 0; transform: scale(1.1) translateY(-20px); } 
-  70% { transform: scale(0.98) translateY(2px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); } 
+/* ==========================================
+   CARTA DE TAROT (CSS 3D)
+   ========================================== */
+.tarot-scene {
+    width: 100%;
+    max-width: 240px;
+    aspect-ratio: 2/3;
+    perspective: 1000px;
+    margin: 0 auto;
+    cursor: pointer;
 }
 
+.tarot-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+}
+
+.tarot-card.flipped { transform: rotateY(180deg); }
+
+.tarot-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.tarot-front {
+    background-color: var(--accent-green);
+    /* 
+      FUTURE: Para usar uma imagem real no verso da carta, descomente as linhas abaixo e insira o caminho.
+      Remova os elementos SVG (mandala) de dentro da div .tarot-front no index.html se usar a imagem.
+    */
+    /* background-image: url('imagens/verso-tarot.jpg'); */
+    /* background-size: cover; */
+    /* background-position: center; */
+}
+
+/* O "verso" da carta no CSS é na verdade a frente (onde a pedra é revelada) */
+.tarot-back {
+    background-color: var(--card-bg);
+    transform: rotateY(180deg);
+    flex-direction: column;
+}
+
+/* Estilização Base dos Cards do App */
 .crystal-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(62, 39, 35, 0.05);
+    border-radius: 16px;
 }
-.dark .crystal-card { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
 
-/* Estilização para o <details> (Sanfona de Cuidados) */
+/* Detalhes Místicos (Molduras) */
+.mystic-border {
+    position: relative;
+}
+.mystic-border::before, .mystic-border::after {
+    content: ''; position: absolute; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.mystic-border::before { top: 0; }
+.mystic-border::after { bottom: 0; }
+
 details > summary { list-style: none; cursor: pointer; }
 details > summary::-webkit-details-marker { display: none; }
-
-/* Adicione isso ao final do seu style.css */
-.crystal-card .h-28, .crystal-card .h-56 {
-    background-color: var(--border-color); /* Cor de fundo enquanto carrega */
-    background-blend-mode: multiply;
-}
+--- END OF FILE style.css ---
