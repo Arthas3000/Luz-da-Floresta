@@ -28,8 +28,8 @@ body {
    [CSS_02_TAROT_GIGANTE]
    ========================================== */
 .tarot-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
-    opacity: 0; pointer-events: none; transition: opacity 0.6s ease; z-index: 65;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease; z-index: 65;
 }
 .tarot-overlay.active { opacity: 1; pointer-events: auto; }
 
@@ -41,34 +41,35 @@ body {
     cursor: pointer;
     position: relative;
     z-index: 10;
-    transition: width 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                transform 0.5s ease;
+    transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* Indicador visual de que a carta do dia já está lá */
+/* Indicador visual discreto */
 .tarot-scene.carta-ja-revelada::after {
-    content: 'CARTA REVELADA';
-    position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%);
-    font-size: 8px; font-weight: 800; letter-spacing: 2px; color: var(--gold);
+    content: 'CARTA DO DIA';
+    position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+    font-size: 8px; font-weight: 800; letter-spacing: 1px; color: var(--gold);
+    opacity: 0.7;
 }
 
 .tarot-card {
     width: 100%; height: 100%; position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .tarot-card.suspense-ativo {
-    transform: scale(1.15) translateY(-5%) rotateZ(2deg);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    transform: scale(1.1) rotateZ(1deg);
 }
 
+/* ESTADO EXPANDIDO (ZOOM E REVELAÇÃO) */
 .tarot-scene.is-expanding {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    width: 92vw; max-width: 360px;
-    height: 85vh; max-height: 620px;
+    position: fixed; 
+    top: 0; /* Alinha ao topo para evitar que o conteúdo suma para baixo */
+    left: 50%;
+    transform: translateX(-50%) translateY(5vh); /* Pequeno respiro do topo */
+    width: 94vw; max-width: 380px;
+    height: 85vh; max-height: 700px;
     z-index: 70;
 }
 
@@ -76,14 +77,10 @@ body {
     transform: rotateY(180deg); 
 }
 
-.tarot-scene.placed-on-table {
-    transform: translate(-50%, -50%) scale(0.98);
-}
-
 .tarot-face {
     position: absolute; width: 100%; height: 100%;
-    backface-visibility: hidden; border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    backface-visibility: hidden; border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     background-color: var(--card-bg);
 }
 
@@ -104,7 +101,7 @@ body {
 
 .conteudo-verso-interno {
     opacity: 0;
-    transition: opacity 0.4s ease 0.5s;
+    transition: opacity 0.3s ease 0.4s;
 }
 .tarot-card.flipped .conteudo-verso-interno {
     opacity: 1;

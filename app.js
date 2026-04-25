@@ -27,7 +27,6 @@ async function carregarDadosBanco() {
         dbIncenses = dados.incensos || {};
         renderizarListaCatalogo('todos', '');
         
-        // Verifica se já existe uma carta do dia ao carregar
         verificarCartaDoDia();
     } catch (error) { 
         console.error("Erro ao carregar data.json", error); 
@@ -69,7 +68,7 @@ function obterDadosDoItem(id) {
 }
 
 // ==========================================
-// [JS_03_GERAR_HTML_DETALHE] USADO PELA CARTA E MODAL
+// [JS_03_GERAR_HTML_DETALHE]
 // ==========================================
 function gerarHtmlDetalhesItem(id, isTarot = false) {
     const item = obterDadosDoItem(id);
@@ -89,7 +88,7 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
                     <h3 class="font-bold uppercase tracking-wider text-[10px] mb-2 flex items-center gap-2" style="color: var(--gold);">
                         <i data-lucide="sparkles" class="w-3 h-3"></i> Sinergia
                     </h3>
-                    <div onclick="abrirModalPadrao('${par.id}')" class="flex items-center gap-3 p-2 rounded-xl border border-[#C0A062] cursor-pointer active:scale-95 transition-transform" style="background-color: rgba(192, 160, 98, 0.05);">
+                    <div onclick="abrirModalPadrao('${par.id}')" class="flex items-center gap-3 p-2 rounded-xl border border-[#C0A062] cursor-pointer" style="background-color: rgba(192, 160, 98, 0.05);">
                         <div class="w-10 h-10 rounded-lg bg-cover bg-center bg-[#E6E0D4]" style="background-image: url('${par.imagem_url || IMG_PLACEHOLDER}')"></div>
                         <div class="flex-1">
                             <p class="text-sm font-bold" style="color: var(--text-main);">${par.nome}</p>
@@ -119,32 +118,31 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
     let btnFecharTarotHTML = '';
     if(isTarot) {
         btnFecharTarotHTML = `
-            <button onclick="fecharCartaGigante(event)" class="w-full mt-4 py-3 rounded-xl font-bold text-white shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2" style="background-color: var(--text-main);">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i> Guardar Carta
+            <button onclick="fecharCartaGigante(event)" class="w-full mt-6 py-4 rounded-xl font-bold text-white shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2" style="background-color: var(--text-main);">
+                Guardar Carta
             </button>
         `;
     }
 
     return `
         <div class="conteudo-verso-interno block w-full">
-            <div class="h-40 w-full bg-cover bg-center relative bg-[#E6E0D4] shrink-0" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}');">
-                <div class="absolute top-2 right-2 bg-white/80 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest text-[#C0A062] border border-[#C0A062]">Carta do Dia</div>
-                <div class="absolute bottom-0 w-full h-12 bg-gradient-to-t from-white to-transparent"></div>
+            <div class="h-44 w-full bg-cover bg-center relative bg-[#E6E0D4] shrink-0" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}');">
+                <div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest text-[#C0A062] border border-[#C0A062]">Carta do Dia</div>
             </div>
-            <div class="px-4 -mt-4 relative z-10 pb-6">
-                <h2 class="text-2xl font-serif font-bold mb-0.5" style="color: var(--text-main);">${item.nome}</h2>
-                <p class="text-[10px] font-bold uppercase tracking-widest mb-4" style="color: var(--gold);">${tagInfo}</p>
+            <div class="px-5 -mt-4 relative z-10 pb-8">
+                <h2 class="text-3xl font-serif font-bold mb-0.5" style="color: var(--text-main);">${item.nome}</h2>
+                <p class="text-[10px] font-bold uppercase tracking-widest mb-6" style="color: var(--gold);">${tagInfo}</p>
                 
-                <div class="flex gap-2 mb-4">
-                    <button onclick="alternarItemAltar('${id}', 'colecao', ${isTarot})" class="flex-1 py-2.5 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${taNaColecao ? 'bg-[#2E4F2B] text-white' : 'bg-[#E6E0D4] text-[#3E2723]'}">
-                        <i data-lucide="check-circle" class="w-3 h-3"></i> ${taNaColecao ? "Na Coleção" : "Já Tenho"}
+                <div class="flex gap-2 mb-6">
+                    <button onclick="alternarItemAltar('${id}', 'colecao', ${isTarot})" class="flex-1 py-3 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${taNaColecao ? 'bg-[#2E4F2B] text-white' : 'bg-[#E6E0D4] text-[#3E2723]'}">
+                        ${taNaColecao ? "Na Coleção" : "Já Tenho"}
                     </button>
-                    <button onclick="alternarItemAltar('${id}', 'desejo', ${isTarot})" class="flex-1 py-2.5 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${taNoDesejo ? 'bg-[#C0A062] text-white' : 'bg-transparent border border-[#C0A062] text-[#C0A062]'}">
-                        <i data-lucide="heart" class="w-3 h-3"></i> ${taNoDesejo ? "Desejado" : "Eu Quero"}
+                    <button onclick="alternarItemAltar('${id}', 'desejo', ${isTarot})" class="flex-1 py-3 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${taNoDesejo ? 'bg-[#C0A062] text-white' : 'bg-transparent border border-[#C0A062] text-[#C0A062]'}">
+                        ${taNoDesejo ? "Desejado" : "Eu Quero"}
                     </button>
                 </div>
                 
-                <div class="space-y-3 text-xs text-[#795548] leading-relaxed">
+                <div class="space-y-4 text-sm text-[#795548] leading-relaxed">
                     <p>${item.energia}</p>
                     ${cuidadosHTML}
                     ${sinergiaHTML}
@@ -170,9 +168,9 @@ function verificarCartaDoDia() {
     const storage = JSON.parse(localStorage.getItem('cartaDoDia'));
     
     if (storage && storage.data === hoje) {
-        // Se já tirou a carta hoje, ela já nasce virada ou pronta
         tarotBackContent.innerHTML = gerarHtmlDetalhesItem(storage.id, true);
         lucide.createIcons();
+        tarotCard.classList.add('flipped');
         tarotScene.classList.add('carta-ja-revelada');
     }
 }
@@ -184,31 +182,25 @@ function configurarOraculoCartaGigante() {
         const hoje = new Date().toLocaleDateString();
         const storage = JSON.parse(localStorage.getItem('cartaDoDia'));
 
-        // Se já existe uma carta do dia, apenas abre a que já existe sem sortear
+        // AÇÃO 2: ZOOM (Se a carta já está virada para cima)
         if (storage && storage.data === hoje) {
-            abrirCartaExistente(storage.id);
+            ativarZoomCarta();
             return;
         }
 
-        // Se for nova tiragem
+        // AÇÃO 1: REVELAR (Primeiro clique do dia)
         executarSorteioNovo(hoje);
     });
 }
 
-function abrirCartaExistente(id) {
+function ativarZoomCarta() {
     isTarotFlipping = true;
     dispararVibracao('click');
-    tarotBackContent.innerHTML = gerarHtmlDetalhesItem(id, true);
-    lucide.createIcons();
-    
     tarotOverlay.classList.add('active');
     tarotScene.classList.add('is-expanding'); 
     setTimeout(() => {
-        tarotCard.classList.add('flipped');
-        setTimeout(() => {
-            tarotScene.classList.add('placed-on-table');
-            isTarotFlipping = false;
-        }, 600);
+        tarotScene.classList.add('placed-on-table');
+        isTarotFlipping = false;
     }, 100);
 }
 
@@ -220,7 +212,6 @@ function executarSorteioNovo(dataHoje) {
     const chaves = Object.keys(dbCrystals);
     const idSorteado = chaves[Math.floor(Math.random() * chaves.length)];
     
-    // Salva no storage
     localStorage.setItem('cartaDoDia', JSON.stringify({ data: dataHoje, id: idSorteado }));
     
     tarotBackContent.innerHTML = gerarHtmlDetalhesItem(idSorteado, true);
@@ -239,21 +230,20 @@ function executarSorteioNovo(dataHoje) {
                 tarotScene.classList.add('carta-ja-revelada');
             }, 800); 
         }, 200);
-    }, 1200);
+    }, 1000);
 }
 
 function fecharCartaGigante(event) {
-    if(event) event.stopPropagation(); // Impede o loop de reabertura
+    if(event) event.stopPropagation(); 
     dispararVibracao('click');
     tarotScene.classList.remove('placed-on-table');
     tarotScene.classList.remove('is-expanding');
-    tarotCard.classList.remove('flipped');
     tarotOverlay.classList.remove('active');
     
     setTimeout(() => {
         tarotCard.classList.remove('suspense-ativo');
         tarotBackContent.scrollTop = 0; 
-    }, 800);
+    }, 600);
 }
 
 // ==========================================
@@ -331,11 +321,11 @@ function gerarCardListagemHTML(item) {
     const taNoDesejo = meuAltar.desejo.includes(item.id);
     const badgeColor = item.tipo === 'cristal' ? 'bg-[#2E4F2B]' : 'bg-[#C0A062]';
     return `
-        <div onclick="abrirModalPadrao('${item.id}')" class="crystal-card rounded-xl overflow-hidden cursor-pointer active:scale-95 transition-transform flex flex-col relative">
+        <div onclick="abrirModalPadrao('${item.id}')" class="crystal-card rounded-xl overflow-hidden flex flex-col relative">
             <div class="absolute top-2 left-2 z-10 text-[9px] text-white px-2 py-0.5 rounded-full uppercase font-bold tracking-wider ${badgeColor}">${item.tipo}</div>
             ${taNaColecao ? '<i data-lucide="check-circle" class="absolute top-2 right-2 text-green-500 bg-white rounded-full w-5 h-5 z-10 shadow-sm"></i>' : ''}
             ${taNoDesejo ? '<i data-lucide="heart" class="absolute top-2 right-2 text-[#C0A062] bg-white rounded-full w-5 h-5 z-10 shadow-sm"></i>' : ''}
-            <div class="h-32 bg-cover bg-center border-b relative bg-[#E6E0D4]" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}'); background-blend-mode: multiply;"></div>
+            <div class="h-32 bg-cover bg-center border-b relative bg-[#E6E0D4]" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}');"></div>
             <div class="p-3">
                 <p class="font-bold text-sm truncate w-full" style="color: var(--text-main);">${item.nome}</p>
                 <p class="text-[10px] truncate w-full mt-0.5" style="color: var(--text-muted);">${item.tags?.slice(0,2).join(', ') || ''}</p>
