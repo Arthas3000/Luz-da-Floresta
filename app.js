@@ -26,6 +26,9 @@ async function carregarDadosBanco() {
         dbCrystals = dados.cristais || {};
         dbIncenses = dados.incensos || {};
         renderizarListaCatalogo('todos', '');
+        
+        // Verifica se já existe uma carta do dia ao carregar
+        verificarCartaDoDia();
     } catch (error) { 
         console.error("Erro ao carregar data.json", error); 
     }
@@ -82,17 +85,16 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
         const par = obterDadosDoItem(item.sinergia);
         if (par) {
             sinergiaHTML = `
-                <div class="mt-6 pt-6 border-t" style="border-color: var(--border-color);">
-                    <h3 class="font-bold uppercase tracking-wider text-xs mb-3 flex items-center gap-2" style="color: var(--gold);">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i> Sinergia Perfeita
+                <div class="mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <h3 class="font-bold uppercase tracking-wider text-[10px] mb-2 flex items-center gap-2" style="color: var(--gold);">
+                        <i data-lucide="sparkles" class="w-3 h-3"></i> Sinergia
                     </h3>
-                    <div onclick="abrirModalPadrao('${par.id}')" class="flex items-center gap-3 p-3 rounded-xl border border-[#C0A062] cursor-pointer active:scale-95 transition-transform" style="background-color: rgba(192, 160, 98, 0.05);">
-                        <div class="w-12 h-12 rounded-lg bg-cover bg-center bg-[#E6E0D4]" style="background-image: url('${par.imagem_url || IMG_PLACEHOLDER}')"></div>
+                    <div onclick="abrirModalPadrao('${par.id}')" class="flex items-center gap-3 p-2 rounded-xl border border-[#C0A062] cursor-pointer active:scale-95 transition-transform" style="background-color: rgba(192, 160, 98, 0.05);">
+                        <div class="w-10 h-10 rounded-lg bg-cover bg-center bg-[#E6E0D4]" style="background-image: url('${par.imagem_url || IMG_PLACEHOLDER}')"></div>
                         <div class="flex-1">
-                            <p class="text-xs uppercase text-[#C0A062] font-bold">Combinar com</p>
                             <p class="text-sm font-bold" style="color: var(--text-main);">${par.nome}</p>
                         </div>
-                        <i data-lucide="chevron-right" class="w-5 h-5 text-[#C0A062]"></i>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-[#C0A062]"></i>
                     </div>
                 </div>
             `;
@@ -102,11 +104,11 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
     let cuidadosHTML = '';
     if (isCristal && item.cuidados) {
         cuidadosHTML = `
-            <details class="group p-4 mt-4 rounded-xl border transition-all" style="background-color: var(--bg-color); border-color: var(--border-color);">
-                <summary class="font-bold text-xs uppercase tracking-wider flex justify-between items-center outline-none cursor-pointer" style="color: var(--text-main);">
-                    Como Cuidar <i data-lucide="chevron-down" class="w-4 h-4 group-open:rotate-180 transition-transform" style="color: var(--accent-green);"></i>
+            <details class="group p-3 mt-3 rounded-xl border transition-all" style="background-color: var(--bg-color); border-color: var(--border-color);">
+                <summary class="font-bold text-[10px] uppercase tracking-wider flex justify-between items-center outline-none cursor-pointer" style="color: var(--text-main);">
+                    Como Cuidar <i data-lucide="chevron-down" class="w-3 h-3 group-open:rotate-180 transition-transform" style="color: var(--accent-green);"></i>
                 </summary>
-                <div class="pt-3 mt-3 border-t space-y-3 text-xs leading-relaxed" style="border-color: var(--border-color); color: var(--text-muted);">
+                <div class="pt-2 mt-2 border-t space-y-2 text-[11px] leading-relaxed" style="border-color: var(--border-color); color: var(--text-muted);">
                     <p><strong style="color: var(--accent-green);">Limpeza:</strong> ${item.cuidados.limpeza}</p>
                     <p><strong style="color: var(--accent-green);">Energização:</strong> ${item.cuidados.energizacao}</p>
                 </div>
@@ -117,32 +119,32 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
     let btnFecharTarotHTML = '';
     if(isTarot) {
         btnFecharTarotHTML = `
-            <button onclick="fecharCartaGigante()" class="w-full mt-6 py-4 rounded-xl font-bold text-white shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2" style="background-color: var(--text-main);">
+            <button onclick="fecharCartaGigante(event)" class="w-full mt-4 py-3 rounded-xl font-bold text-white shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2" style="background-color: var(--text-main);">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Guardar Carta
             </button>
         `;
     }
 
-    // UX FIX: Imagem com altura reduzida (h-48) para garantir que Título e Tags apareçam imediatamente na tela.
     return `
         <div class="conteudo-verso-interno block w-full">
-            <div class="h-48 w-full bg-cover bg-center relative bg-[#E6E0D4] shrink-0" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}');">
-                <div class="absolute bottom-0 w-full h-16 bg-gradient-to-t from-white to-transparent"></div>
+            <div class="h-40 w-full bg-cover bg-center relative bg-[#E6E0D4] shrink-0" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}');">
+                <div class="absolute top-2 right-2 bg-white/80 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest text-[#C0A062] border border-[#C0A062]">Carta do Dia</div>
+                <div class="absolute bottom-0 w-full h-12 bg-gradient-to-t from-white to-transparent"></div>
             </div>
-            <div class="px-5 -mt-6 relative z-10 pb-8">
-                <h2 class="text-3xl font-serif font-bold mb-1" style="color: var(--text-main);">${item.nome}</h2>
-                <p class="text-xs font-bold uppercase tracking-widest mb-5" style="color: var(--gold);">${tagInfo}</p>
+            <div class="px-4 -mt-4 relative z-10 pb-6">
+                <h2 class="text-2xl font-serif font-bold mb-0.5" style="color: var(--text-main);">${item.nome}</h2>
+                <p class="text-[10px] font-bold uppercase tracking-widest mb-4" style="color: var(--gold);">${tagInfo}</p>
                 
-                <div class="flex gap-2 mb-6">
-                    <button onclick="alternarItemAltar('${id}', 'colecao', ${isTarot})" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${taNaColecao ? 'bg-[#2E4F2B] text-white' : 'bg-[#E6E0D4] text-[#3E2723]'}">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i> ${taNaColecao ? "Na Coleção" : "Já Tenho"}
+                <div class="flex gap-2 mb-4">
+                    <button onclick="alternarItemAltar('${id}', 'colecao', ${isTarot})" class="flex-1 py-2.5 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${taNaColecao ? 'bg-[#2E4F2B] text-white' : 'bg-[#E6E0D4] text-[#3E2723]'}">
+                        <i data-lucide="check-circle" class="w-3 h-3"></i> ${taNaColecao ? "Na Coleção" : "Já Tenho"}
                     </button>
-                    <button onclick="alternarItemAltar('${id}', 'desejo', ${isTarot})" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${taNoDesejo ? 'bg-[#C0A062] text-white' : 'bg-transparent border border-[#C0A062] text-[#C0A062]'}">
-                        <i data-lucide="heart" class="w-4 h-4"></i> ${taNoDesejo ? "Desejado" : "Eu Quero"}
+                    <button onclick="alternarItemAltar('${id}', 'desejo', ${isTarot})" class="flex-1 py-2.5 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${taNoDesejo ? 'bg-[#C0A062] text-white' : 'bg-transparent border border-[#C0A062] text-[#C0A062]'}">
+                        <i data-lucide="heart" class="w-3 h-3"></i> ${taNoDesejo ? "Desejado" : "Eu Quero"}
                     </button>
                 </div>
                 
-                <div class="space-y-4 text-sm text-[#795548] leading-relaxed">
+                <div class="space-y-3 text-xs text-[#795548] leading-relaxed">
                     <p>${item.energia}</p>
                     ${cuidadosHTML}
                     ${sinergiaHTML}
@@ -155,7 +157,7 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
 }
 
 // ==========================================
-// [JS_04_CARTA_GIGANTE] LÓGICA DO ORÁCULO E ANIMAÇÃO
+// [JS_04_CARTA_GIGANTE] LÓGICA DO ORÁCULO
 // ==========================================
 const tarotScene = document.getElementById('tarot-scene');
 const tarotCard = document.getElementById('tarot-card');
@@ -163,49 +165,85 @@ const tarotOverlay = document.getElementById('tarot-overlay');
 const tarotBackContent = document.getElementById('tarot-back-content');
 let isTarotFlipping = false;
 
+function verificarCartaDoDia() {
+    const hoje = new Date().toLocaleDateString();
+    const storage = JSON.parse(localStorage.getItem('cartaDoDia'));
+    
+    if (storage && storage.data === hoje) {
+        // Se já tirou a carta hoje, ela já nasce virada ou pronta
+        tarotBackContent.innerHTML = gerarHtmlDetalhesItem(storage.id, true);
+        lucide.createIcons();
+        tarotScene.classList.add('carta-ja-revelada');
+    }
+}
+
 function configurarOraculoCartaGigante() {
     tarotScene.addEventListener('click', () => {
         if (isTarotFlipping || tarotScene.classList.contains('is-expanding')) return;
-        isTarotFlipping = true;
-        dispararVibracao('magica');
         
-        // 1. Suspense inicial
-        tarotCard.classList.add('suspense-ativo');
-        
-        // Sorteio
-        const chaves = Object.keys(dbCrystals);
-        const idSorteado = chaves[Math.floor(Math.random() * chaves.length)];
-        
-        // Injeta conteúdo
-        tarotBackContent.innerHTML = gerarHtmlDetalhesItem(idSorteado, true);
-        lucide.createIcons();
-        
-        // UX FIX IMPORTANTE: Garante que o scroll inicie perfeitamente no topo!
-        tarotBackContent.scrollTop = 0;
-        
-        // 2. Transição de Expansão e Giro
-        setTimeout(() => {
-            tarotOverlay.classList.add('active');
-            tarotScene.classList.add('is-expanding'); 
-            
-            // Pequeno delay pra dar tempo da carta começar a crescer antes de virar
-            setTimeout(() => {
-                tarotCard.classList.add('flipped');
-                dispararVibracao('click');
-                
-                // 3. Efeito Mesa (diminui 2%)
-                setTimeout(() => {
-                    tarotScene.classList.add('placed-on-table');
-                    isTarotFlipping = false;
-                }, 800); 
+        const hoje = new Date().toLocaleDateString();
+        const storage = JSON.parse(localStorage.getItem('cartaDoDia'));
 
-            }, 200);
+        // Se já existe uma carta do dia, apenas abre a que já existe sem sortear
+        if (storage && storage.data === hoje) {
+            abrirCartaExistente(storage.id);
+            return;
+        }
 
-        }, 1200); // Tempo do suspense antes de crescer
+        // Se for nova tiragem
+        executarSorteioNovo(hoje);
     });
 }
 
-function fecharCartaGigante() {
+function abrirCartaExistente(id) {
+    isTarotFlipping = true;
+    dispararVibracao('click');
+    tarotBackContent.innerHTML = gerarHtmlDetalhesItem(id, true);
+    lucide.createIcons();
+    
+    tarotOverlay.classList.add('active');
+    tarotScene.classList.add('is-expanding'); 
+    setTimeout(() => {
+        tarotCard.classList.add('flipped');
+        setTimeout(() => {
+            tarotScene.classList.add('placed-on-table');
+            isTarotFlipping = false;
+        }, 600);
+    }, 100);
+}
+
+function executarSorteioNovo(dataHoje) {
+    isTarotFlipping = true;
+    dispararVibracao('magica');
+    tarotCard.classList.add('suspense-ativo');
+    
+    const chaves = Object.keys(dbCrystals);
+    const idSorteado = chaves[Math.floor(Math.random() * chaves.length)];
+    
+    // Salva no storage
+    localStorage.setItem('cartaDoDia', JSON.stringify({ data: dataHoje, id: idSorteado }));
+    
+    tarotBackContent.innerHTML = gerarHtmlDetalhesItem(idSorteado, true);
+    lucide.createIcons();
+    tarotBackContent.scrollTop = 0;
+    
+    setTimeout(() => {
+        tarotOverlay.classList.add('active');
+        tarotScene.classList.add('is-expanding'); 
+        setTimeout(() => {
+            tarotCard.classList.add('flipped');
+            dispararVibracao('click');
+            setTimeout(() => {
+                tarotScene.classList.add('placed-on-table');
+                isTarotFlipping = false;
+                tarotScene.classList.add('carta-ja-revelada');
+            }, 800); 
+        }, 200);
+    }, 1200);
+}
+
+function fecharCartaGigante(event) {
+    if(event) event.stopPropagation(); // Impede o loop de reabertura
     dispararVibracao('click');
     tarotScene.classList.remove('placed-on-table');
     tarotScene.classList.remove('is-expanding');
@@ -214,27 +252,21 @@ function fecharCartaGigante() {
     
     setTimeout(() => {
         tarotCard.classList.remove('suspense-ativo');
-        // Reseta o scroll p/ próxima vez oculto
         tarotBackContent.scrollTop = 0; 
     }, 800);
 }
 
 // ==========================================
-// [JS_05_MODAL_PADRAO] USADO EM LISTAS E NO QUIZ
+// [JS_05_MODAL_PADRAO] 
 // ==========================================
 function abrirModalPadrao(id) {
     dispararVibracao('click');
     const content = document.getElementById('item-content');
-    
     content.innerHTML = gerarHtmlDetalhesItem(id, false);
     lucide.createIcons();
-    
-    // Força o modal a nascer no topo
     document.getElementById('item-container').scrollTop = 0;
-
     const modal = document.getElementById('modal-item');
     const container = document.getElementById('item-container');
-    
     modal.classList.remove('hidden');
     setTimeout(() => {
         modal.classList.remove('opacity-0');
@@ -251,20 +283,18 @@ function fecharModalPadrao() {
 }
 
 // ==========================================
-// [JS_06_ALTAR] FAVORITOS LOCAL STORAGE
+// [JS_06_ALTAR]
 // ==========================================
 function salvarDadosAltar() { localStorage.setItem('altarFloresta', JSON.stringify(meuAltar)); }
 
 function alternarItemAltar(id, tipo, recarregarTarot = false) {
     dispararVibracao('sucesso');
     const outroTipo = tipo === 'colecao' ? 'desejo' : 'colecao';
-    
     meuAltar[outroTipo] = meuAltar[outroTipo].filter(i => i !== id);
     if (meuAltar[tipo].includes(id)) meuAltar[tipo] = meuAltar[tipo].filter(i => i !== id);
     else meuAltar[tipo].push(id);
     salvarDadosAltar();
     
-    // Atualiza a View onde o botão foi clicado, mantendo a rolagem onde estava
     if (recarregarTarot) {
         const container = document.getElementById('tarot-back-content');
         const pos = container.scrollTop;
@@ -277,7 +307,6 @@ function alternarItemAltar(id, tipo, recarregarTarot = false) {
         container.scrollTop = pos;
     }
     lucide.createIcons();
-    
     if(!document.getElementById('view-altar').classList.contains('hidden')) atualizarExibicaoAltar();
 }
 
@@ -285,7 +314,6 @@ let abaAltarAtiva = 'colecao';
 function configurarSistemaAltar() {
     const btnColecao = document.getElementById('btn-colecao');
     const btnDesejos = document.getElementById('btn-desejos');
-
     const setAba = (ativo, inativo, aba) => {
         abaAltarAtiva = aba;
         ativo.classList.remove('opacity-60', 'bg-transparent');
@@ -294,7 +322,6 @@ function configurarSistemaAltar() {
         inativo.classList.remove('bg-white', 'shadow-sm');
         atualizarExibicaoAltar();
     };
-
     btnColecao.onclick = () => setAba(btnColecao, btnDesejos, 'colecao');
     btnDesejos.onclick = () => setAba(btnDesejos, btnColecao, 'desejo');
 }
@@ -332,16 +359,14 @@ function atualizarExibicaoAltar() {
 }
 
 // ==========================================
-// [JS_07_EXPLORAR] BUSCA E LISTA
+// [JS_07_EXPLORAR]
 // ==========================================
 function configurarBuscaEFiltros() {
     const input = document.getElementById('search-input');
     const btns = document.querySelectorAll('.filter-btn');
     let filtroAtual = 'todos';
-
     const rodarPesquisa = () => { renderizarListaCatalogo(filtroAtual, input.value.toLowerCase()); };
     input.addEventListener('input', rodarPesquisa);
-
     btns.forEach(btn => {
         btn.addEventListener('click', () => {
             btns.forEach(b => {
@@ -380,7 +405,7 @@ function renderizarListaCatalogo(filtro, termo) {
 }
 
 // ==========================================
-// [JS_08_QUIZ] FLUXO DE PERGUNTAS E RESULTADO
+// [JS_08_QUIZ]
 // ==========================================
 const PERGUNTAS_SITUACIONAIS = [
     { text: "Como sua mente se comportou ao deitar para dormir nas últimas noites?", options: [{txt: "Acelerada, pensando no futuro.", val: "calma"}, {txt: "Pesada, absorvendo energia dos outros.", val: "protecao"}, {txt: "Tranquila, mas acordo sem energia.", val: "vitalidade"}] },
@@ -395,8 +420,10 @@ let indicePerguntaAtual = 0;
 let arrayDeRespostas = [];
 
 function configurarFluxoQuiz() {
-    document.getElementById('btn-iniciar-quiz').addEventListener('click', iniciarTelaQuiz);
-    document.getElementById('close-quiz').addEventListener('click', fecharTelaQuiz);
+    const btn = document.getElementById('btn-iniciar-quiz');
+    if(btn) btn.addEventListener('click', iniciarTelaQuiz);
+    const close = document.getElementById('close-quiz');
+    if(close) close.addEventListener('click', fecharTelaQuiz);
 }
 
 function iniciarTelaQuiz() {
@@ -464,18 +491,14 @@ function calcularEExibirResultado() {
     const ritual = prescricoes[sentimentoDominante] || prescricoes["calma"];
     const cristalObj = obterDadosDoItem(ritual.c);
     const incensoObj = obterDadosDoItem(ritual.i);
-
     const container = document.getElementById('quiz-content');
     
-    // O botão "Ver mais" abre o modal Padrão (z-60) sem fechar o modal do quiz (z-50). Ao fechar o modal padrão, o usuário cai de volta aqui.
     container.innerHTML = `
         <div class="fade-in text-center pb-10">
             <i data-lucide="sparkles" class="w-10 h-10 mx-auto mb-4" style="color: var(--gold);"></i>
             <h2 class="text-2xl font-serif font-bold mb-2" style="color: var(--text-main);">Seu Ritual Perfeito</h2>
             <p class="text-sm mb-8 leading-relaxed" style="color: var(--text-muted);">${ritual.msg}</p>
-            
             <div class="flex flex-col gap-4 text-left">
-                <!-- Cristal -->
                 <div class="flex items-center gap-4 p-3 rounded-xl border border-[#2E4F2B] bg-[#2E4F2B]/5">
                     <div class="w-16 h-16 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('${cristalObj.imagem_url || IMG_PLACEHOLDER}')"></div>
                     <div class="flex-1">
@@ -484,10 +507,7 @@ function calcularEExibirResultado() {
                     </div>
                     <button onclick="abrirModalPadrao('${ritual.c}')" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-[#2E4F2B] text-[#2E4F2B] active:bg-[#2E4F2B] active:text-white transition-colors">Ver mais</button>
                 </div>
-                
                 <div class="flex justify-center -my-2 z-10"><div class="w-6 h-6 rounded-full bg-white border border-[#C0A062] flex items-center justify-center font-bold text-xs text-[#C0A062]">+</div></div>
-                
-                <!-- Incenso -->
                 <div class="flex items-center gap-4 p-3 rounded-xl border border-[#C0A062] bg-[#C0A062]/5">
                     <div class="w-16 h-16 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('${incensoObj.imagem_url || IMG_PLACEHOLDER}')"></div>
                     <div class="flex-1">
@@ -497,7 +517,6 @@ function calcularEExibirResultado() {
                     <button onclick="abrirModalPadrao('${ritual.i}')" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-[#C0A062] text-[#C0A062] active:bg-[#C0A062] active:text-white transition-colors">Ver mais</button>
                 </div>
             </div>
-            
             <button onclick="fecharTelaQuiz()" class="w-full mt-10 py-4 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-transform" style="background-color: var(--accent-green);">Finalizar Teste</button>
         </div>
     `;

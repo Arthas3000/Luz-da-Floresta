@@ -18,26 +18,21 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Oculta scrollbar mas mantém a funcionalidade do scroll */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Animação genérica de entrada */
 .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==========================================
-   [CSS_02_TAROT_GIGANTE] ESTRUTURA E ANIMAÇÕES
+   [CSS_02_TAROT_GIGANTE]
    ========================================== */
-
-/* Overlay escuro para destacar a carta */
 .tarot-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
     opacity: 0; pointer-events: none; transition: opacity 0.6s ease; z-index: 65;
 }
 .tarot-overlay.active { opacity: 1; pointer-events: auto; }
 
-/* Container base da carta na tela inicial */
 .tarot-scene {
     width: 140px;
     height: 240px;
@@ -46,46 +41,45 @@ body {
     cursor: pointer;
     position: relative;
     z-index: 10;
-    /* Transições de crescimento e movimento para o centro da tela */
     transition: width 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), 
                 height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), 
                 transform 0.5s ease;
 }
 
-/* O elemento que sofre a rotação 3D */
+/* Indicador visual de que a carta do dia já está lá */
+.tarot-scene.carta-ja-revelada::after {
+    content: 'CARTA REVELADA';
+    position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%);
+    font-size: 8px; font-weight: 800; letter-spacing: 2px; color: var(--gold);
+}
+
 .tarot-card {
     width: 100%; height: 100%; position: relative;
     transform-style: preserve-3d;
     transition: transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* [ANIMACAO_TAROT_SUSPENSE] Fase 1: Tremor/Preparação */
 .tarot-card.suspense-ativo {
     transform: scale(1.15) translateY(-5%) rotateZ(2deg);
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
 
-/* [ANIMACAO_TAROT_CRESCER] Fase 2: Pula pro centro da tela */
 .tarot-scene.is-expanding {
     position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%) scale(1);
-    /* Tamanho final da carta gigante */
-    width: 88vw; max-width: 380px;
-    height: 80vh; max-height: 700px;
+    width: 92vw; max-width: 360px;
+    height: 85vh; max-height: 620px;
     z-index: 70;
 }
 
-/* [ANIMACAO_TAROT_GIRAR] Fase 3: Roda a carta */
 .tarot-scene.is-expanding .tarot-card.flipped { 
     transform: rotateY(180deg); 
 }
 
-/* [ANIMACAO_TAROT_POUSAR] Fase 4: O recuo simulando a mesa */
 .tarot-scene.placed-on-table {
     transform: translate(-50%, -50%) scale(0.98);
 }
 
-/* Configuração comum das duas faces */
 .tarot-face {
     position: absolute; width: 100%; height: 100%;
     backface-visibility: hidden; border-radius: 16px;
@@ -93,27 +87,24 @@ body {
     background-color: var(--card-bg);
 }
 
-/* Face Mística (Verso inicial) */
 .tarot-front {
     background-color: var(--accent-green);
     border: 2px solid var(--gold);
     display: flex; align-items: center; justify-content: center;
 }
 
-/* Face do Cristal (O resultado) */
 .tarot-back {
     transform: rotateY(180deg);
     border: 2px solid var(--gold);
     overflow-y: auto; 
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    display: block; /* Alterado de flex para block para evitar bugs de scroll */
+    display: block; 
 }
 
-/* [ANIMACAO_FADE_CONTEUDO] Esconde o conteúdo durante o giro e revela suavemente */
 .conteudo-verso-interno {
     opacity: 0;
-    transition: opacity 0.4s ease 0.5s; /* O delay garante que só aparece após o giro */
+    transition: opacity 0.4s ease 0.5s;
 }
 .tarot-card.flipped .conteudo-verso-interno {
     opacity: 1;
@@ -129,7 +120,6 @@ body {
     border-radius: 16px;
 }
 
-/* Molduras Místicas para Títulos */
 .mystic-border { position: relative; }
 .mystic-border::before, .mystic-border::after {
     content: ''; position: absolute; left: 0; right: 0; height: 1px;
