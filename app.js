@@ -1,4 +1,3 @@
---- START OF FILE app.js ---
 // ==========================================
 // DADOS GLOBAIS E CONFIGURAÇÕES
 // ==========================================
@@ -473,4 +472,3 @@ function calcularResultadoQuiz() {
     `;
     lucide.createIcons();
 }
---- END OF FILE app.js ---
