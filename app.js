@@ -1,14 +1,11 @@
 // ==========================================
-// [VARIAVEIS_GLOBAIS] BANCO DE DADOS E ESTADO
+// [JS_01_ESTADO_GLOBAL] CONFIGURAÇÕES E BANCO
 // ==========================================
 let dbCrystals = {};
 let dbIncenses = {};
 let meuAltar = JSON.parse(localStorage.getItem('altarFloresta')) || { colecao: [], desejo:[] };
 const IMG_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C0A062' stroke-width='1'%3E%3Cpath d='M12 2L2 12l10 10 10-10L12 2z'/%3E%3C/svg%3E";
 
-// ==========================================
-// [INICIALIZACAO]
-// ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
     lucide.createIcons();
     await carregarDadosBanco();
@@ -19,10 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     configurarOraculoCartaGigante();
     configurarFluxoQuiz();
     
-    // Fecha o Modal Padrão (Isso não fecha a carta gigante, apenas o Modal que abre da busca/quiz)
     document.getElementById('close-item').addEventListener('click', fecharModalPadrao);
-    
-    // [FUTURA_IMPLEMENTACAO] Função p/ Fase da Lua
 });
 
 async function carregarDadosBanco() {
@@ -37,7 +31,6 @@ async function carregarDadosBanco() {
     }
 }
 
-// [HAPTICS] Função para vibrar dispositivo
 function dispararVibracao(tipo) {
     if (!("vibrate" in navigator)) return;
     if (tipo === 'click') navigator.vibrate(30);
@@ -46,7 +39,7 @@ function dispararVibracao(tipo) {
 }
 
 // ==========================================
-// [NAVEGACAO_BASICA] ABAS INFERIORES
+// [JS_02_NAVEGACAO] ABAS
 // ==========================================
 function configurarNavegacaoAbas() {
     const botoes = document.querySelectorAll('.nav-btn');
@@ -73,10 +66,8 @@ function obterDadosDoItem(id) {
 }
 
 // ==========================================
-// [FUNCAO_GERAR_HTML_DETALHES] COMPONENTE REUTILIZÁVEL (CARTA GIGANTE E MODAL)
+// [JS_03_GERAR_HTML_DETALHE] USADO PELA CARTA E MODAL
 // ==========================================
-// Como a Carta de Tarot e o Modal Padrao exibem a mesma coisa, criei uma funcao que gera o "recheio" do card.
-// isTarot (boolean) adiciona um botão especial de Fechar apenas quando injetado dentro da Carta Gigante.
 function gerarHtmlDetalhesItem(id, isTarot = false) {
     const item = obterDadosDoItem(id);
     if (!item) return '';
@@ -90,7 +81,6 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
     if (item.sinergia) {
         const par = obterDadosDoItem(item.sinergia);
         if (par) {
-            // Se estiver na carta de Tarot, o clique em Sinergia abre o Modal Padrão por cima!
             sinergiaHTML = `
                 <div class="mt-6 pt-6 border-t" style="border-color: var(--border-color);">
                     <h3 class="font-bold uppercase tracking-wider text-xs mb-3 flex items-center gap-2" style="color: var(--gold);">
@@ -124,7 +114,6 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
         `;
     }
 
-    // Botão de fechar customizado APENAS para a carta de tarot (O modal usa um 'X' flutuante fora do html)
     let btnFecharTarotHTML = '';
     if(isTarot) {
         btnFecharTarotHTML = `
@@ -134,15 +123,15 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
         `;
     }
 
-    // [FADE_CONTEUDO] A classe .conteudo-verso-interno faz o fade in junto com a animação da carta
+    // UX FIX: Imagem com altura reduzida (h-48) para garantir que Título e Tags apareçam imediatamente na tela.
     return `
-        <div class="conteudo-verso-interno">
-            <div class="h-56 w-full bg-cover bg-center relative bg-[#E6E0D4] shrink-0" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}');">
-                <div class="absolute bottom-0 w-full h-24 bg-gradient-to-t from-white to-transparent"></div>
+        <div class="conteudo-verso-interno block w-full">
+            <div class="h-48 w-full bg-cover bg-center relative bg-[#E6E0D4] shrink-0" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}');">
+                <div class="absolute bottom-0 w-full h-16 bg-gradient-to-t from-white to-transparent"></div>
             </div>
-            <div class="px-6 -mt-6 relative z-10 pb-8">
+            <div class="px-5 -mt-6 relative z-10 pb-8">
                 <h2 class="text-3xl font-serif font-bold mb-1" style="color: var(--text-main);">${item.nome}</h2>
-                <p class="text-xs font-bold uppercase tracking-widest mb-6" style="color: var(--gold);">${tagInfo}</p>
+                <p class="text-xs font-bold uppercase tracking-widest mb-5" style="color: var(--gold);">${tagInfo}</p>
                 
                 <div class="flex gap-2 mb-6">
                     <button onclick="alternarItemAltar('${id}', 'colecao', ${isTarot})" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${taNaColecao ? 'bg-[#2E4F2B] text-white' : 'bg-[#E6E0D4] text-[#3E2723]'}">
@@ -166,73 +155,83 @@ function gerarHtmlDetalhesItem(id, isTarot = false) {
 }
 
 // ==========================================
-// [COMPORTAMENTO_CARTA_GIGANTE] ANIMAÇÕES DO ORÁCULO
+// [JS_04_CARTA_GIGANTE] LÓGICA DO ORÁCULO E ANIMAÇÃO
 // ==========================================
 const tarotScene = document.getElementById('tarot-scene');
 const tarotCard = document.getElementById('tarot-card');
 const tarotOverlay = document.getElementById('tarot-overlay');
+const tarotBackContent = document.getElementById('tarot-back-content');
 let isTarotFlipping = false;
 
 function configurarOraculoCartaGigante() {
     tarotScene.addEventListener('click', () => {
-        // Ignora cliques adicionais durante a animação ou se já está aberto
         if (isTarotFlipping || tarotScene.classList.contains('is-expanding')) return;
         isTarotFlipping = true;
         dispararVibracao('magica');
         
-        // Fase 1: Suspense e recuo inicial (Começa a vibrar na mão)
+        // 1. Suspense inicial
         tarotCard.classList.add('suspense-ativo');
         
-        // Sorteia silenciosamente
+        // Sorteio
         const chaves = Object.keys(dbCrystals);
         const idSorteado = chaves[Math.floor(Math.random() * chaves.length)];
         
-        // Injeta o HTML completo no verso escondido
-        document.getElementById('tarot-back-content').innerHTML = gerarHtmlDetalhesItem(idSorteado, true);
-        lucide.createIcons(); // renderiza os incones injetados
+        // Injeta conteúdo
+        tarotBackContent.innerHTML = gerarHtmlDetalhesItem(idSorteado, true);
+        lucide.createIcons();
         
-        // Fase 2: Cresce e Vira
+        // UX FIX IMPORTANTE: Garante que o scroll inicie perfeitamente no topo!
+        tarotBackContent.scrollTop = 0;
+        
+        // 2. Transição de Expansão e Giro
         setTimeout(() => {
-            tarotOverlay.classList.add('active'); // escurece o fundo
-            tarotScene.classList.add('is-expanding'); // Carta expande pra quase 100%
-            tarotCard.classList.add('flipped'); // Faz o giro (o verso já contém o texto com fade in ativado via CSS)
-            dispararVibracao('click');
+            tarotOverlay.classList.add('active');
+            tarotScene.classList.add('is-expanding'); 
             
-            // Fase 3: Pousa na Mesa (Redução suave de 2%)
+            // Pequeno delay pra dar tempo da carta começar a crescer antes de virar
             setTimeout(() => {
-                tarotScene.classList.add('placed-on-table');
-                isTarotFlipping = false;
-            }, 1000); // 1s é o tempo da transição do Transform do .tarot-card no CSS
+                tarotCard.classList.add('flipped');
+                dispararVibracao('click');
+                
+                // 3. Efeito Mesa (diminui 2%)
+                setTimeout(() => {
+                    tarotScene.classList.add('placed-on-table');
+                    isTarotFlipping = false;
+                }, 800); 
 
-        }, 1500); // Fica 1.5s no suspense balançando
+            }, 200);
+
+        }, 1200); // Tempo do suspense antes de crescer
     });
 }
 
 function fecharCartaGigante() {
     dispararVibracao('click');
-    // Recolhe de volta
     tarotScene.classList.remove('placed-on-table');
     tarotScene.classList.remove('is-expanding');
     tarotCard.classList.remove('flipped');
     tarotOverlay.classList.remove('active');
     
-    // Remove o suspense pra ficar zerada pra próxima
     setTimeout(() => {
         tarotCard.classList.remove('suspense-ativo');
+        // Reseta o scroll p/ próxima vez oculto
+        tarotBackContent.scrollTop = 0; 
     }, 800);
 }
 
 // ==========================================
-// [COMPORTAMENTO_MODAL_PADRAO] USADO PELA LISTA/QUIZ
+// [JS_05_MODAL_PADRAO] USADO EM LISTAS E NO QUIZ
 // ==========================================
 function abrirModalPadrao(id) {
     dispararVibracao('click');
     const content = document.getElementById('item-content');
     
-    // Aproveita a geracao html mas diz que isTarot = false (Nao poe o botao guardar carta)
     content.innerHTML = gerarHtmlDetalhesItem(id, false);
     lucide.createIcons();
     
+    // Força o modal a nascer no topo
+    document.getElementById('item-container').scrollTop = 0;
+
     const modal = document.getElementById('modal-item');
     const container = document.getElementById('item-container');
     
@@ -252,7 +251,7 @@ function fecharModalPadrao() {
 }
 
 // ==========================================
-// [SISTEMA_ALTAR] FAVORITOS LOCAL STORAGE
+// [JS_06_ALTAR] FAVORITOS LOCAL STORAGE
 // ==========================================
 function salvarDadosAltar() { localStorage.setItem('altarFloresta', JSON.stringify(meuAltar)); }
 
@@ -265,11 +264,17 @@ function alternarItemAltar(id, tipo, recarregarTarot = false) {
     else meuAltar[tipo].push(id);
     salvarDadosAltar();
     
-    // Atualiza a view de onde partiu o clique
+    // Atualiza a View onde o botão foi clicado, mantendo a rolagem onde estava
     if (recarregarTarot) {
-        document.getElementById('tarot-back-content').innerHTML = gerarHtmlDetalhesItem(id, true);
+        const container = document.getElementById('tarot-back-content');
+        const pos = container.scrollTop;
+        container.innerHTML = gerarHtmlDetalhesItem(id, true);
+        container.scrollTop = pos;
     } else {
+        const container = document.getElementById('item-container');
+        const pos = container.scrollTop;
         document.getElementById('item-content').innerHTML = gerarHtmlDetalhesItem(id, false);
+        container.scrollTop = pos;
     }
     lucide.createIcons();
     
@@ -327,7 +332,7 @@ function atualizarExibicaoAltar() {
 }
 
 // ==========================================
-// [BUSCA_EXPLORAR_UNIFICADA]
+// [JS_07_EXPLORAR] BUSCA E LISTA
 // ==========================================
 function configurarBuscaEFiltros() {
     const input = document.getElementById('search-input');
@@ -375,7 +380,7 @@ function renderizarListaCatalogo(filtro, termo) {
 }
 
 // ==========================================
-// [LOGICA_QUIZ] QUESTIONÁRIO DINÂMICO E PRESCRICAO
+// [JS_08_QUIZ] FLUXO DE PERGUNTAS E RESULTADO
 // ==========================================
 const PERGUNTAS_SITUACIONAIS = [
     { text: "Como sua mente se comportou ao deitar para dormir nas últimas noites?", options: [{txt: "Acelerada, pensando no futuro.", val: "calma"}, {txt: "Pesada, absorvendo energia dos outros.", val: "protecao"}, {txt: "Tranquila, mas acordo sem energia.", val: "vitalidade"}] },
@@ -462,8 +467,7 @@ function calcularEExibirResultado() {
 
     const container = document.getElementById('quiz-content');
     
-    // [BOTAO_VER_MAIS] Ao clicar em Ver Mais, o abrirModalPadrao cria o card sobre o Quiz. 
-    // O fecharModalPadrao esconde a sobreposição e o user volta pro Quiz.
+    // O botão "Ver mais" abre o modal Padrão (z-60) sem fechar o modal do quiz (z-50). Ao fechar o modal padrão, o usuário cai de volta aqui.
     container.innerHTML = `
         <div class="fade-in text-center pb-10">
             <i data-lucide="sparkles" class="w-10 h-10 mx-auto mb-4" style="color: var(--gold);"></i>
@@ -473,7 +477,7 @@ function calcularEExibirResultado() {
             <div class="flex flex-col gap-4 text-left">
                 <!-- Cristal -->
                 <div class="flex items-center gap-4 p-3 rounded-xl border border-[#2E4F2B] bg-[#2E4F2B]/5">
-                    <div class="w-16 h-16 rounded-lg bg-cover bg-center" style="background-image: url('${cristalObj.imagem_url || IMG_PLACEHOLDER}')"></div>
+                    <div class="w-16 h-16 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('${cristalObj.imagem_url || IMG_PLACEHOLDER}')"></div>
                     <div class="flex-1">
                         <p class="text-[10px] font-bold uppercase tracking-wider text-[#2E4F2B]">Pedra Guia</p>
                         <p class="font-bold text-[#3E2723]">${cristalObj.nome}</p>
@@ -485,7 +489,7 @@ function calcularEExibirResultado() {
                 
                 <!-- Incenso -->
                 <div class="flex items-center gap-4 p-3 rounded-xl border border-[#C0A062] bg-[#C0A062]/5">
-                    <div class="w-16 h-16 rounded-lg bg-cover bg-center" style="background-image: url('${incensoObj.imagem_url || IMG_PLACEHOLDER}')"></div>
+                    <div class="w-16 h-16 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('${incensoObj.imagem_url || IMG_PLACEHOLDER}')"></div>
                     <div class="flex-1">
                         <p class="text-[10px] font-bold uppercase tracking-wider text-[#C0A062]">Aromaterapia</p>
                         <p class="font-bold text-[#3E2723]">${incensoObj.nome}</p>
