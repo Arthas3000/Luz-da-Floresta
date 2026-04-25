@@ -361,7 +361,7 @@ function configurarSorteioDia() {
             setTimeout(() => {
                 btn.innerHTML = `<i data-lucide="sparkles"></i> Revelar Novo Cristal`;
                 lucide.createIcons();
-            }, 500);
+            }, 2950);
         }, 1500);
     });
 }
