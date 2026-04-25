@@ -1,12 +1,12 @@
 /* ==========================================
-   TEMA MÍSTICO LUZ DA FLORESTA
+   [ESTILO_GERAL] TEMA MÍSTICO LUZ DA FLORESTA
    ========================================== */
 :root {
-    --bg-color: #FDFBF7; /* Papel antigo/creme */
-    --text-main: #3E2723; /* Marrom escuro orgânico */
+    --bg-color: #FDFBF7; /* Fundo Creme / Papel Antigo */
+    --text-main: #3E2723; /* Marrom escuro */
     --text-muted: #795548; /* Marrom médio */
-    --accent-green: #2E4F2B; /* Verde Musgo/Floresta */
-    --gold: #C0A062; /* Dourado envelhecido */
+    --accent-green: #2E4F2B; /* Verde Musgo */
+    --gold: #C0A062; /* Dourado místico */
     --card-bg: #FFFFFF;
     --border-color: #E6E0D4;
 }
@@ -18,68 +18,84 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+/* [SCROLLBAR_OCULTA] Esconde a barra de rolagem mas permite o deslize */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Animações de Entrada */
+/* [ANIMACAO_ENTRADA] Fade in padrao para elementos */
 .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ==========================================
-   CARTA DE TAROT (CSS 3D)
+   [ESTILO_CARTA_TAROT] CONFIGURAÇÃO 3D E ANIMAÇÕES
    ========================================== */
 .tarot-scene {
     width: 100%;
-    max-width: 240px;
-    aspect-ratio: 2/3;
-    perspective: 1000px;
+    /* Proporção clássica de carta de Tarot (Aprox 70x120mm = 7/12) */
+    max-width: 180px;
+    aspect-ratio: 7 / 12; 
+    perspective: 1200px;
     margin: 0 auto;
     cursor: pointer;
+    position: relative;
+    z-index: 10;
 }
 
 .tarot-card {
     width: 100%;
     height: 100%;
     position: relative;
-    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Transição suave para o efeito de suspense e giro */
+    transition: transform 1s cubic-bezier(0.25, 0.8, 0.25, 1);
     transform-style: preserve-3d;
 }
 
-.tarot-card.flipped { transform: rotateY(180deg); }
+/* [CLASSE_SUSPENSE] Carta cresce e se aproxima da tela antes de virar */
+.tarot-card.suspense-ativo {
+    transform: scale(1.15) translateY(-5%) rotateZ(2deg);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
 
+/* [CLASSE_FLIP] Realiza o giro 3D revelando o verso */
+.tarot-card.flipped { 
+    transform: scale(1.15) translateY(-5%) rotateY(180deg); 
+}
+
+/* Faces da carta (Frente e Costas) */
 .tarot-face {
     position: absolute;
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    border: 2px solid var(--gold);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(62, 39, 35, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
 }
 
+/* [TAROT_FRENTE] Visualmente as costas da carta (mística, verde e dourada) */
 .tarot-front {
     background-color: var(--accent-green);
-    /* 
-      FUTURE: Para usar uma imagem real no verso da carta, descomente as linhas abaixo e insira o caminho.
-      Remova os elementos SVG (mandala) de dentro da div .tarot-front no index.html se usar a imagem.
-    */
+    border: 2px solid var(--gold);
+    /* [FUTURO_VERSO_IMAGEM] Descomente e insira o caminho da imagem caso prefira uma foto real no lugar dos vetores CSS */
     /* background-image: url('imagens/verso-tarot.jpg'); */
     /* background-size: cover; */
     /* background-position: center; */
 }
 
-/* O "verso" da carta no CSS é na verdade a frente (onde a pedra é revelada) */
+/* [TAROT_VERSO] Onde a imagem do cristal é projetada durante o giro */
 .tarot-back {
     background-color: var(--card-bg);
     transform: rotateY(180deg);
+    border: 2px solid var(--gold);
     flex-direction: column;
 }
 
-/* Estilização Base dos Cards do App */
+/* ==========================================
+   [ESTILO_CARDS_UI] CARTÕES NORMAIS DO CATÁLOGO
+   ========================================== */
 .crystal-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -87,7 +103,7 @@ body {
     border-radius: 16px;
 }
 
-/* Detalhes Místicos (Molduras) */
+/* [MOLDURA_MISTICA] Bordas douradas sutis no Header */
 .mystic-border {
     position: relative;
 }

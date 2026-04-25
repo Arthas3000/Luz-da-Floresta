@@ -1,54 +1,68 @@
 // ==========================================
-// DADOS GLOBAIS E CONFIGURAÇÕES
+// [VARIAVEIS_GLOBAIS] DADOS E CONFIGURAÇÕES
 // ==========================================
 let dbCrystals = {};
 let dbIncenses = {};
+
+// Gerenciamento do LocalStorage (Meu Altar)
 let meuAltar = JSON.parse(localStorage.getItem('altarFloresta')) || { colecao: [], desejo:[] };
 
+// Placeholder caso falte alguma imagem
 const IMG_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C0A062' stroke-width='1'%3E%3Cpath d='M12 2L2 12l10 10 10-10L12 2z'/%3E%3C/svg%3E";
 
 // ==========================================
-// INICIALIZAÇÃO
+// [INICIALIZACAO_APP] BOOTSTRAP DO SISTEMA
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
     lucide.createIcons();
-    await carregarDados();
+    await carregarDadosBanco();
     
-    configurarNavegacao();
+    configurarNavegacaoAbas();
     configurarBuscaEFiltros();
-    configurarAltar();
+    configurarSistemaAltar();
     configurarOraculoTarot();
-    configurarQuiz();
+    configurarFluxoQuiz();
     
     document.getElementById('close-item').addEventListener('click', fecharModalItem);
     
-    // FUTURE: Aqui você poderia chamar uma função para calcular a fase da lua.
+    // [FUTURA_IMPLEMENTACAO] Função para calcular fase da lua pode ser chamada aqui
 });
 
-async function carregarDados() {
+async function carregarDadosBanco() {
     try {
         const response = await fetch('data.json');
         const dados = await response.json();
         dbCrystals = dados.cristais || {};
         dbIncenses = dados.incensos || {};
         
-        // Renderiza tudo na aba explorar inicialmente
-        renderizarCatalogo('todos', '');
+        // Renderiza catálogo inicial
+        renderizarListaCatalogo('todos', '');
     } catch (error) { 
         console.error("Erro ao carregar data.json", error); 
     }
 }
 
 // ==========================================
-// NAVEGAÇÃO BASE
+// [HAPTICS] CONTROLE DE VIBRAÇÃO DO CELULAR
 // ==========================================
-function configurarNavegacao() {
+function dispararVibracao(tipo) {
+    if (!("vibrate" in navigator)) return;
+    if (tipo === 'click') navigator.vibrate(30);
+    if (tipo === 'sucesso') navigator.vibrate([100, 50, 100]);
+    if (tipo === 'magica') navigator.vibrate([50, 100, 50, 150, 50, 200]);
+}
+
+// ==========================================
+// [NAVEGACAO] CONTROLE DAS ABAS INFERIORES
+// ==========================================
+function configurarNavegacaoAbas() {
     const botoes = document.querySelectorAll('.nav-btn');
     const views = document.querySelectorAll('.tab-content');
 
     botoes.forEach(btn => {
         btn.addEventListener('click', () => {
             const target = btn.getAttribute('data-target');
+            
             views.forEach(v => v.classList.add('hidden'));
             document.getElementById(target).classList.remove('hidden', 'opacity-0');
 
@@ -59,29 +73,24 @@ function configurarNavegacao() {
             btn.classList.add('active-tab');
             btn.classList.remove('opacity-50');
 
-            if(target === 'view-altar') atualizarAbaAltar();
+            if(target === 'view-altar') atualizarExibicaoAltar();
         });
     });
 }
 
-function vibrar(tipo) {
-    // FUTURE: Sound Healing - Aqui entraria a chamada para um áudio 432Hz.
-    if (!("vibrate" in navigator)) return;
-    if (tipo === 'click') navigator.vibrate(30);
-    if (tipo === 'sucesso') navigator.vibrate([100, 50, 100]);
-    if (tipo === 'magica') navigator.vibrate([50, 100, 50, 150, 50, 200]);
-}
+// ==========================================
+// [MODAL_ITEM] RENDERIZAÇÃO DO CARD DE CRISTAL/INCENSO
+// ==========================================
 
-// ==========================================
-// RENDERIZAÇÃO E MODAL (UNIFICADO)
-// ==========================================
-function obterItem(id) {
+// Retorna objeto unificado procurando em cristais e incensos
+function obterDadosDoItem(id) {
     if (dbCrystals[id]) return { ...dbCrystals[id], id, categoria: 'cristal' };
     if (dbIncenses[id]) return { ...dbIncenses[id], id, categoria: 'incenso' };
     return null;
 }
 
-function renderizarCardMiniatura(item) {
+// Gera o HTML do card miniatura para as listas
+function gerarCardMiniaturaHTML(item) {
     const taNaColecao = meuAltar.colecao.includes(item.id);
     const taNoDesejo = meuAltar.desejo.includes(item.id);
     const badgeColor = item.tipo === 'cristal' ? 'bg-[#2E4F2B]' : 'bg-[#C0A062]';
@@ -103,9 +112,10 @@ function renderizarCardMiniatura(item) {
     `;
 }
 
+// Popula o modal grande sobrepondo a tela
 function abrirModalItem(id) {
-    vibrar('click');
-    const item = obterItem(id);
+    dispararVibracao('click');
+    const item = obterDadosDoItem(id);
     if (!item) return;
 
     const modal = document.getElementById('modal-item');
@@ -119,10 +129,10 @@ function abrirModalItem(id) {
     const isCristal = item.tipo === 'cristal';
     const tagInfo = isCristal ? `Chakra: ${item.chakra}` : `Modo de Uso: ${item.como_usar}`;
 
-    // Montando a seção de Sinergia (Cross-selling)
+    // [CROSS_SELLING] Monta seção de Sinergia caso o item possua par
     let sinergiaHTML = '';
     if (item.sinergia) {
-        const par = obterItem(item.sinergia);
+        const par = obterDadosDoItem(item.sinergia);
         if (par) {
             sinergiaHTML = `
                 <div class="mt-6 pt-6 border-t" style="border-color: var(--border-color);">
@@ -142,7 +152,7 @@ function abrirModalItem(id) {
         }
     }
 
-    // HTML de cuidados expansível (Só para cristais)
+    // [SANFONA_CUIDADOS] Apenas cristais têm aba de cuidados
     let cuidadosHTML = '';
     if (isCristal && item.cuidados) {
         cuidadosHTML = `
@@ -167,10 +177,10 @@ function abrirModalItem(id) {
             <p class="text-xs font-bold uppercase tracking-widest mb-6" style="color: var(--gold);">${tagInfo}</p>
             
             <div class="flex gap-2 mb-6">
-                <button onclick="toggleAltarItem('${id}', 'colecao')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${taNaColecao ? 'bg-[#2E4F2B] text-white' : 'bg-[#E6E0D4] text-[#3E2723]'}">
+                <button onclick="alternarItemAltar('${id}', 'colecao')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${taNaColecao ? 'bg-[#2E4F2B] text-white' : 'bg-[#E6E0D4] text-[#3E2723]'}">
                     <i data-lucide="check-circle" class="w-4 h-4"></i> ${taNaColecao ? "Na Coleção" : "Já Tenho"}
                 </button>
-                <button onclick="toggleAltarItem('${id}', 'desejo')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${taNoDesejo ? 'bg-[#C0A062] text-white' : 'bg-transparent border border-[#C0A062] text-[#C0A062]'}">
+                <button onclick="alternarItemAltar('${id}', 'desejo')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${taNoDesejo ? 'bg-[#C0A062] text-white' : 'bg-transparent border border-[#C0A062] text-[#C0A062]'}">
                     <i data-lucide="heart" class="w-4 h-4"></i> ${taNoDesejo ? "Desejado" : "Eu Quero"}
                 </button>
             </div>
@@ -184,9 +194,9 @@ function abrirModalItem(id) {
     `;
 
     lucide.createIcons();
-    modal.classList.remove('hidden');
     
-    // Animação de slide up
+    // Mostra Modal Item
+    modal.classList.remove('hidden');
     setTimeout(() => {
         modal.classList.remove('opacity-0');
         container.classList.remove('translate-y-full');
@@ -199,47 +209,58 @@ function fecharModalItem() {
     container.classList.add('translate-y-full');
     modal.classList.add('opacity-0');
     setTimeout(() => modal.classList.add('hidden'), 300);
+    // [NOTA]: Não fechamos o quiz aqui. Se o Quiz estiver aberto por trás (z-50), ele permanecerá visível ao fechar este modal (z-60).
 }
 
 // ==========================================
-// ALTAR
+// [LOGICA_MEU_ALTAR] GERENCIAMENTO DE ESTADO
 // ==========================================
-function salvarAltar() { localStorage.setItem('altarFloresta', JSON.stringify(meuAltar)); }
+function salvarDadosAltar() { 
+    localStorage.setItem('altarFloresta', JSON.stringify(meuAltar)); 
+}
 
-function toggleAltarItem(id, tipo) {
-    vibrar('sucesso');
+function alternarItemAltar(id, tipo) {
+    dispararVibracao('sucesso');
     const outroTipo = tipo === 'colecao' ? 'desejo' : 'colecao';
+    
+    // Remove do outro tipo se existir
     meuAltar[outroTipo] = meuAltar[outroTipo].filter(i => i !== id);
     
-    if (meuAltar[tipo].includes(id)) meuAltar[tipo] = meuAltar[tipo].filter(i => i !== id);
-    else meuAltar[tipo].push(id);
+    // Toggle no tipo atual
+    if (meuAltar[tipo].includes(id)) {
+        meuAltar[tipo] = meuAltar[tipo].filter(i => i !== id);
+    } else {
+        meuAltar[tipo].push(id);
+    }
     
-    salvarAltar();
-    abrirModalItem(id); 
-    if(!document.getElementById('view-altar').classList.contains('hidden')) atualizarAbaAltar();
+    salvarDadosAltar();
+    abrirModalItem(id); // Recarrega os botoes
+    if(!document.getElementById('view-altar').classList.contains('hidden')) {
+        atualizarExibicaoAltar();
+    }
 }
 
-let abaAltarAtual = 'colecao';
-function configurarAltar() {
+let abaAltarAtiva = 'colecao';
+function configurarSistemaAltar() {
     const btnColecao = document.getElementById('btn-colecao');
     const btnDesejos = document.getElementById('btn-desejos');
 
-    const setAtivo = (ativo, inativo, aba) => {
-        abaAltarAtual = aba;
+    const setAba = (ativo, inativo, aba) => {
+        abaAltarAtiva = aba;
         ativo.classList.remove('opacity-60', 'bg-transparent');
         ativo.classList.add('bg-white', 'shadow-sm');
         inativo.classList.add('opacity-60', 'bg-transparent');
         inativo.classList.remove('bg-white', 'shadow-sm');
-        atualizarAbaAltar();
+        atualizarExibicaoAltar();
     };
 
-    btnColecao.onclick = () => setAtivo(btnColecao, btnDesejos, 'colecao');
-    btnDesejos.onclick = () => setAtivo(btnDesejos, btnColecao, 'desejo');
+    btnColecao.onclick = () => setAba(btnColecao, btnDesejos, 'colecao');
+    btnDesejos.onclick = () => setAba(btnDesejos, btnColecao, 'desejo');
 }
 
-function atualizarAbaAltar() {
+function atualizarExibicaoAltar() {
     const container = document.getElementById('altar-results');
-    const listaIds = meuAltar[abaAltarAtual];
+    const listaIds = meuAltar[abaAltarAtiva];
     
     if(listaIds.length === 0) {
         container.innerHTML = `<p class="text-center py-10 col-span-2 text-sm text-[#795548]">Seu espaço está vazio. Explore e adicione energias aqui.</p>`;
@@ -247,26 +268,26 @@ function atualizarAbaAltar() {
     }
     
     container.innerHTML = listaIds.map(id => {
-        const item = obterItem(id);
-        return item ? renderizarCardMiniatura(item) : '';
+        const item = obterDadosDoItem(id);
+        return item ? gerarCardMiniaturaHTML(item) : '';
     }).join('');
     lucide.createIcons();
 }
 
 // ==========================================
-// BUSCA E EXPLORAR (UNIFICADO)
+// [BUSCA_EXPLORAR] FILTROS E PESQUISA
 // ==========================================
 function configurarBuscaEFiltros() {
     const input = document.getElementById('search-input');
     const btns = document.querySelectorAll('.filter-btn');
     let filtroAtual = 'todos';
 
-    const processarBusca = () => {
+    const rodarPesquisa = () => {
         const termo = input.value.toLowerCase();
-        renderizarCatalogo(filtroAtual, termo);
+        renderizarListaCatalogo(filtroAtual, termo);
     };
 
-    input.addEventListener('input', processarBusca);
+    input.addEventListener('input', rodarPesquisa);
 
     btns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -280,30 +301,31 @@ function configurarBuscaEFiltros() {
             btn.style.borderColor = 'var(--accent-green)';
             
             filtroAtual = btn.getAttribute('data-filter');
-            processarBusca();
+            rodarPesquisa();
         });
     });
 }
 
-function renderizarCatalogo(filtro, termo) {
+function renderizarListaCatalogo(filtro, termo) {
     const container = document.getElementById('explorar-results');
     let resultados = [];
 
-    const buscarEm = (banco) => {
+    // [LÓGICA_NLP_BASICA] Busca em Título e Tags Ocultas
+    const buscarEmBanco = (banco) => {
         return Object.values(banco).filter(item => {
             if(termo === '') return true;
-            const nomeMatch = item.nome.toLowerCase().includes(termo);
-            const tagMatch = item.tags?.some(tag => tag.toLowerCase().includes(termo));
-            return nomeMatch || tagMatch;
+            const matchNome = item.nome.toLowerCase().includes(termo);
+            const matchTag = item.tags?.some(tag => tag.toLowerCase().includes(termo));
+            return matchNome || matchTag;
         });
     };
 
     if (filtro === 'todos' || filtro === 'cristal') {
-        const c = buscarEm(dbCrystals).map(i => ({...i, id: Object.keys(dbCrystals).find(k=>dbCrystals[k].nome===i.nome)}));
+        const c = buscarEmBanco(dbCrystals).map(i => ({...i, id: Object.keys(dbCrystals).find(k=>dbCrystals[k].nome===i.nome)}));
         resultados = resultados.concat(c);
     }
     if (filtro === 'todos' || filtro === 'incenso') {
-        const i = buscarEm(dbIncenses).map(x => ({...x, id: Object.keys(dbIncenses).find(k=>dbIncenses[k].nome===x.nome)}));
+        const i = buscarEmBanco(dbIncenses).map(x => ({...x, id: Object.keys(dbIncenses).find(k=>dbIncenses[k].nome===x.nome)}));
         resultados = resultados.concat(i);
     }
 
@@ -312,12 +334,12 @@ function renderizarCatalogo(filtro, termo) {
         return;
     }
 
-    container.innerHTML = resultados.map(item => renderizarCardMiniatura(item)).join('');
+    container.innerHTML = resultados.map(item => gerarCardMiniaturaHTML(item)).join('');
     lucide.createIcons();
 }
 
 // ==========================================
-// ORÁCULO: CARTA DE TAROT
+// [FUNCAO_SORTEIO_TAROT] ANIMAÇÃO E LÓGICA DO ORÁCULO
 // ==========================================
 function configurarOraculoTarot() {
     const card = document.getElementById('tarot-card');
@@ -326,29 +348,44 @@ function configurarOraculoTarot() {
     card.addEventListener('click', () => {
         if (isFlipping) return;
         isFlipping = true;
-        vibrar('magica');
+        dispararVibracao('magica');
         
-        card.classList.add('flipped');
+        // 1. Efeito de suspense (crescendo e se aproximando)
+        card.classList.add('suspense-ativo');
         
-        // Sorteia após a carta virar e abre o modal
+        // 2. Sorteia o cristal silenciosamente no background
+        const chaves = Object.keys(dbCrystals);
+        const idSorteado = chaves[Math.floor(Math.random() * chaves.length)];
+        const cristalObj = obterDadosDoItem(idSorteado);
+        
+        // Coloca a imagem sorteada no verso da carta 3D para ilustrar o giro
+        document.getElementById('tarot-revealed-image').style.backgroundImage = `url('${cristalObj.imagem_url || IMG_PLACEHOLDER}')`;
+        
+        // 3. Aguarda 1.5s de suspense antes de dar o flip
         setTimeout(() => {
-            const chaves = Object.keys(dbCrystals);
-            const idSorteado = chaves[Math.floor(Math.random() * chaves.length)];
-            abrirModalItem(idSorteado);
+            card.classList.add('flipped');
+            dispararVibracao('click');
             
-            // Retorna a carta pra posição original invisivelmente enquanto o modal ta aberto
+            // 4. Deixa usuário ver a imagem na carta por 1 segundo, depois abre Modal completão
             setTimeout(() => {
-                card.classList.remove('flipped');
-                isFlipping = false;
-            }, 500);
-        }, 800); 
+                abrirModalItem(idSorteado);
+                
+                // 5. Após abrir o modal, reseta a carta 3D atrás do modal de forma invisivel
+                setTimeout(() => {
+                    card.classList.remove('suspense-ativo', 'flipped');
+                    isFlipping = false;
+                }, 500);
+
+            }, 1200);
+
+        }, 1500); 
     });
 }
 
 // ==========================================
-// QUIZ SITUACIONAL "DESCUBRA SUA ENERGIA"
+// [QUIZ_FLUXO] QUESTIONÁRIO DE ENERGIA SITUACIONAL
 // ==========================================
-const PERGUNTAS_QUIZ = [
+const PERGUNTAS_SITUACIONAIS = [
     { text: "Como sua mente se comportou ao deitar para dormir nas últimas noites?", options: [{txt: "Acelerada, pensando no futuro.", val: "calma"}, {txt: "Pesada, absorvendo energia dos outros.", val: "protecao"}, {txt: "Tranquila, mas acordo sem energia.", val: "vitalidade"}] },
     { text: "Onde você costuma sentir tensão física quando passa por um estresse?", options: [{txt: "Na cabeça, testa ou nuca.", val: "calma"}, {txt: "No peito ou na garganta.", val: "comunicacao"}, {txt: "No estômago ou ombros.", val: "vitalidade"}] },
     { text: "Se a sua energia atual fosse um clima, qual seria?", options: [{txt: "Tempestade agitada e imprevisível.", val: "calma"}, {txt: "Dia nublado, estagnado e sem brilho.", val: "vitalidade"}, {txt: "Vento seco, disperso e sem foco.", val: "foco"}] },
@@ -357,49 +394,50 @@ const PERGUNTAS_QUIZ = [
     { text: "Qual palavra soa como um remédio para sua alma hoje?", options: [{txt: "Aterramento", val: "protecao"}, {txt: "Coragem", val: "vitalidade"}, {txt: "Paz", val: "calma"}] }
 ];
 
-let currentQ = 0;
-let respostasValores = [];
+let indicePerguntaAtual = 0;
+let arrayDeRespostas = [];
 
-function configurarQuiz() {
-    document.getElementById('btn-iniciar-quiz').addEventListener('click', iniciarQuiz);
-    document.getElementById('close-quiz').addEventListener('click', fecharQuiz);
+function configurarFluxoQuiz() {
+    document.getElementById('btn-iniciar-quiz').addEventListener('click', iniciarTelaQuiz);
+    document.getElementById('close-quiz').addEventListener('click', fecharTelaQuiz);
 }
 
-function iniciarQuiz() {
-    vibrar('click');
-    currentQ = 0;
-    respostasValores = [];
+function iniciarTelaQuiz() {
+    dispararVibracao('click');
+    indicePerguntaAtual = 0;
+    arrayDeRespostas = [];
     document.getElementById('modal-quiz').classList.remove('hidden');
     setTimeout(() => document.getElementById('modal-quiz').classList.remove('opacity-0'), 10);
-    renderizarPergunta();
+    renderizarEtapaQuiz();
 }
 
-function fecharQuiz() {
+function fecharTelaQuiz() {
     document.getElementById('modal-quiz').classList.add('opacity-0');
     setTimeout(() => document.getElementById('modal-quiz').classList.add('hidden'), 300);
 }
 
-function renderizarPergunta() {
+function renderizarEtapaQuiz() {
     const container = document.getElementById('quiz-content');
-    const bar = document.getElementById('quiz-progress');
+    const barra = document.getElementById('quiz-progress');
     
-    bar.style.width = `${((currentQ) / PERGUNTAS_QUIZ.length) * 100}%`;
+    barra.style.width = `${((indicePerguntaAtual) / PERGUNTAS_SITUACIONAIS.length) * 100}%`;
 
-    if (currentQ >= PERGUNTAS_QUIZ.length) {
-        calcularResultadoQuiz();
+    // Acabaram as perguntas, calcula o resultado
+    if (indicePerguntaAtual >= PERGUNTAS_SITUACIONAIS.length) {
+        calcularEExibirResultado();
         return;
     }
 
-    const q = PERGUNTAS_QUIZ[currentQ];
+    const q = PERGUNTAS_SITUACIONAIS[indicePerguntaAtual];
     
-    // Animação de fade-in para as perguntas
+    // Renderiza pergunta com fade in
     container.innerHTML = `
         <div class="fade-in">
-            <p class="text-[10px] text-center font-bold tracking-widest text-[#C0A062] mb-4">PERGUNTA ${currentQ + 1} DE ${PERGUNTAS_QUIZ.length}</p>
+            <p class="text-[10px] text-center font-bold tracking-widest text-[#C0A062] mb-4">PERGUNTA ${indicePerguntaAtual + 1} DE ${PERGUNTAS_SITUACIONAIS.length}</p>
             <h2 class="text-xl font-serif font-bold text-center mb-8" style="color: var(--text-main);">${q.text}</h2>
             <div class="space-y-3">
-                ${q.options.map((opt, i) => `
-                    <button onclick="responderQuiz('${opt.val}')" class="w-full text-left p-4 rounded-xl border border-[#E6E0D4] bg-white active:bg-gray-50 transition-colors shadow-sm text-sm" style="color: var(--text-main);">
+                ${q.options.map((opt) => `
+                    <button onclick="salvarRespostaQuiz('${opt.val}')" class="w-full text-left p-4 rounded-xl border border-[#E6E0D4] bg-white active:bg-gray-50 transition-colors shadow-sm text-sm" style="color: var(--text-main);">
                         ${opt.txt}
                     </button>
                 `).join('')}
@@ -408,23 +446,23 @@ function renderizarPergunta() {
     `;
 }
 
-// FUTURE: Machine Learning NLP - Substituir a lógica de tally simples abaixo por análise semântica.
-function responderQuiz(valor) {
-    vibrar('click');
-    respostasValores.push(valor);
-    currentQ++;
-    renderizarPergunta();
+function salvarRespostaQuiz(valor) {
+    dispararVibracao('click');
+    arrayDeRespostas.push(valor);
+    indicePerguntaAtual++;
+    renderizarEtapaQuiz();
 }
 
-function calcularResultadoQuiz() {
-    vibrar('magica');
+// [LOGICA_CALCULO_RESULTADO] Processa as respostas
+function calcularEExibirResultado() {
+    dispararVibracao('magica');
     document.getElementById('quiz-progress').style.width = '100%';
     
-    // Acha o valor que mais repetiu
-    const counts = respostasValores.reduce((acc, val) => { acc[val] = (acc[val] || 0) + 1; return acc; }, {});
-    const vencedor = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+    // Descobre o "valor" de sentimento mais clicado
+    const contagem = arrayDeRespostas.reduce((acc, val) => { acc[val] = (acc[val] || 0) + 1; return acc; }, {});
+    const sentimentoDominante = Object.keys(contagem).reduce((a, b) => contagem[a] > contagem[b] ? a : b);
 
-    // Mapeamento de Prescrição Estática (Para simplificar)
+    // [DICIONARIO_PRESCRICAO] Mapeia sentimento para Cristal e Incenso
     const prescricoes = {
         "calma": { c: "ametista", i: "lavanda", msg: "Notamos que sua mente está acelerada e pedindo descanso. Este ritual vai desacelerar seus pensamentos." },
         "protecao": { c: "turmalina-negra", i: "arruda", msg: "Você está absorvendo o ambiente. É hora de fechar seu campo energético e descarregar o peso." },
@@ -434,11 +472,13 @@ function calcularResultadoQuiz() {
         "amor": { c: "ametista", i: "lavanda", msg: "Conecte-se com seu chakra superior para ouvir sua intuição pura." }
     };
 
-    const ritual = prescricoes[vencedor] || prescricoes["calma"];
-    const cristalObj = obterItem(ritual.c);
-    const incensoObj = obterItem(ritual.i);
+    const ritual = prescricoes[sentimentoDominante] || prescricoes["calma"];
+    const cristalObj = obterDadosDoItem(ritual.c);
+    const incensoObj = obterDadosDoItem(ritual.i);
 
     const container = document.getElementById('quiz-content');
+    
+    // Constroi a tela final com os "Ver mais" que sobrepõem via Modal sem fechar o Quiz
     container.innerHTML = `
         <div class="fade-in text-center pb-10">
             <i data-lucide="sparkles" class="w-10 h-10 mx-auto mb-4" style="color: var(--gold);"></i>
@@ -446,28 +486,33 @@ function calcularResultadoQuiz() {
             <p class="text-sm mb-8 leading-relaxed" style="color: var(--text-muted);">${ritual.msg}</p>
             
             <div class="flex flex-col gap-4 text-left">
-                <!-- Cristal -->
-                <div onclick="fecharQuiz(); abrirModalItem('${ritual.c}')" class="flex items-center gap-4 p-3 rounded-xl border border-[#2E4F2B] bg-[#2E4F2B]/5 cursor-pointer">
+                
+                <!-- Bloco do Cristal Recomendado -->
+                <div class="flex items-center gap-4 p-3 rounded-xl border border-[#2E4F2B] bg-[#2E4F2B]/5">
                     <div class="w-16 h-16 rounded-lg bg-cover bg-center" style="background-image: url('${cristalObj.imagem_url || IMG_PLACEHOLDER}')"></div>
-                    <div>
+                    <div class="flex-1">
                         <p class="text-[10px] font-bold uppercase tracking-wider text-[#2E4F2B]">Pedra Guia</p>
                         <p class="font-bold text-[#3E2723]">${cristalObj.nome}</p>
                     </div>
+                    <!-- Chama Modal por cima -->
+                    <button onclick="abrirModalItem('${ritual.c}')" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-[#2E4F2B] text-[#2E4F2B] active:bg-[#2E4F2B] active:text-white transition-colors">Ver mais</button>
                 </div>
                 
                 <div class="flex justify-center -my-2 z-10"><div class="w-6 h-6 rounded-full bg-white border border-[#C0A062] flex items-center justify-center font-bold text-xs text-[#C0A062]">+</div></div>
                 
-                <!-- Incenso -->
-                <div onclick="fecharQuiz(); abrirModalItem('${ritual.i}')" class="flex items-center gap-4 p-3 rounded-xl border border-[#C0A062] bg-[#C0A062]/5 cursor-pointer">
+                <!-- Bloco do Incenso Recomendado -->
+                <div class="flex items-center gap-4 p-3 rounded-xl border border-[#C0A062] bg-[#C0A062]/5">
                     <div class="w-16 h-16 rounded-lg bg-cover bg-center" style="background-image: url('${incensoObj.imagem_url || IMG_PLACEHOLDER}')"></div>
-                    <div>
+                    <div class="flex-1">
                         <p class="text-[10px] font-bold uppercase tracking-wider text-[#C0A062]">Aromaterapia</p>
                         <p class="font-bold text-[#3E2723]">${incensoObj.nome}</p>
                     </div>
+                    <!-- Chama Modal por cima -->
+                    <button onclick="abrirModalItem('${ritual.i}')" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-[#C0A062] text-[#C0A062] active:bg-[#C0A062] active:text-white transition-colors">Ver mais</button>
                 </div>
             </div>
             
-            <button onclick="fecharQuiz()" class="w-full mt-10 py-4 rounded-xl font-bold text-white shadow-lg" style="background-color: var(--accent-green);">Finalizar Teste</button>
+            <button onclick="fecharTelaQuiz()" class="w-full mt-10 py-4 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-transform" style="background-color: var(--accent-green);">Finalizar Teste</button>
         </div>
     `;
     lucide.createIcons();
