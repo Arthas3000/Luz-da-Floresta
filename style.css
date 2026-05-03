@@ -22,7 +22,11 @@ body {
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* CORREÇÃO: Usar transform: none no estado final para evitar a criação de um Containing Block persistente */
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: none; } 
+}
 
 /* ==========================================
    [CSS_02_TAROT_GIGANTE]
@@ -65,11 +69,12 @@ body {
 /* ESTADO EXPANDIDO (ZOOM E REVELAÇÃO) */
 .tarot-scene.is-expanding {
     position: fixed; 
-    top: 0; /* Alinha ao topo para evitar que o conteúdo suma para baixo */
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%) translateY(5vh); /* Pequeno respiro do topo */
+    transform: translate(-50%, -50%); 
     width: 94vw; max-width: 380px;
     height: 85vh; max-height: 700px;
+    margin: 0; /* Previne interferência do margin: 0 auto original no cálculo */
     z-index: 70;
 }
 
