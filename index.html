@@ -8,16 +8,125 @@
     <meta name="theme-color" content="#FDFBF7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <link rel="stylesheet" href="./style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* ==========================================
+           [CSS] PALETA E VARIÁVEIS
+           ========================================== */
+        :root {
+            --bg-color: #FDFBF7;
+            --text-main: #3E2723;
+            --text-muted: #795548;
+            --accent-green: #2E4F2B;
+            --gold: #C0A062;
+            --card-bg: #FFFFFF;
+            --border-color: #E6E0D4;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* CORREÇÃO 1: Removido o transform do fade-in para evitar a criação de Containing Blocks que quebram o position: fixed */
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+
+        /* ==========================================
+           [CSS] TAROT GIGANTE E ORÁCULO
+           ========================================== */
+        .tarot-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease; z-index: 65;
+        }
+        .tarot-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .tarot-scene {
+            width: 140px; height: 240px;
+            perspective: 1200px; margin: 0 auto;
+            cursor: pointer; position: relative; z-index: 10;
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .tarot-scene.carta-ja-revelada::after {
+            content: 'CARTA DO DIA';
+            position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+            font-size: 8px; font-weight: 800; letter-spacing: 1px; color: var(--gold); opacity: 0.7;
+        }
+
+        .tarot-card {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .tarot-card.suspense-ativo { transform: scale(1.1) rotateZ(1deg); }
+
+        /* CORREÇÃO 2: Centralização Absoluta Perfeita + dvh */
+        .tarot-scene.is-expanding {
+            position: fixed; 
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%); 
+            width: 90vw; max-width: 380px;
+            height: 82dvh; max-height: 700px;
+            margin: 0; /* Anula o margin do estado inicial */
+            z-index: 9999;
+        }
+
+        .tarot-scene.is-expanding .tarot-card.flipped { transform: rotateY(180deg); }
+
+        .tarot-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4); background-color: var(--card-bg);
+        }
+        .tarot-front {
+            background-color: var(--accent-green); border: 2px solid var(--gold);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .tarot-back {
+            transform: rotateY(180deg); border: 2px solid var(--gold);
+            overflow-y: auto; overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch; display: block; 
+        }
+
+        .conteudo-verso-interno { opacity: 0; transition: opacity 0.3s ease 0.4s; }
+        .tarot-card.flipped .conteudo-verso-interno { opacity: 1; }
+
+        /* ==========================================
+           [CSS] CARDS DO CATÁLOGO E LISTAGEM
+           ========================================== */
+        .crystal-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(62, 39, 35, 0.05); border-radius: 16px;
+        }
+
+        .mystic-border { position: relative; }
+        .mystic-border::before, .mystic-border::after {
+            content: ''; position: absolute; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .mystic-border::before { top: 0; }
+        .mystic-border::after { bottom: 0; }
+
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
 </head>
 <body class="antialiased overflow-hidden">
 
     <main class="w-full h-[100dvh] flex flex-col relative sm:max-w-md sm:mx-auto sm:border-x sm:border-gray-200" style="background-color: var(--bg-color);">
         
-        <!-- [HTML_01_HEADER] -->
+        <!-- HEADER -->
         <header class="p-5 flex justify-center items-center z-30 mystic-border pb-4" style="background-color: var(--bg-color);">
             <div class="text-center flex flex-col items-center">
                 <i data-lucide="moon" class="w-4 h-4 mb-1" style="color: var(--gold);"></i>
@@ -26,7 +135,7 @@
             </div>
         </header>
 
-        <!-- [HTML_02_CONTAINER_ABAS] -->
+        <!-- CONTAINER ABAS -->
         <div class="flex-1 overflow-y-auto no-scrollbar relative pb-20">
             
             <!-- ABA 1: ORÁCULO E QUIZ -->
@@ -48,13 +157,11 @@
                     <div class="flex-1 h-px bg-gradient-to-l from-transparent to-[#C0A062]"></div>
                 </div>
 
-                <!-- [HTML_03_TAROT] Componente Carta Gigante -->
+                <!-- COMPONENTE ORÁCULO -->
                 <div class="tarot-overlay" id="tarot-overlay"></div>
 
                 <div class="tarot-scene" id="tarot-scene">
                     <div class="tarot-card" id="tarot-card">
-                        
-                        <!-- Face Mística (Verso visível ao abrir o app) -->
                         <div class="tarot-face tarot-front relative">
                             <div class="absolute inset-2 border border-[#C0A062] rounded-lg opacity-80"></div>
                             <div class="absolute inset-3 border border-[#C0A062] rounded border-dashed opacity-50"></div>
@@ -66,10 +173,7 @@
                                 <polygon points="50,135 53,125 63,122 53,119 50,109 47,119 37,122 47,125" fill="currentColor"/>
                             </svg>
                         </div>
-
-                        <!-- Face do Cristal (Injetada via JS) -->
                         <div class="tarot-face tarot-back no-scrollbar" id="tarot-back-content"></div>
-
                     </div>
                 </div>
                 
@@ -107,7 +211,7 @@
 
         </div>
 
-        <!-- [HTML_04_NAVEGACAO] -->
+        <!-- NAVEGAÇÃO -->
         <nav class="absolute bottom-0 w-full flex justify-around px-2 py-3 z-30 border-t bg-opacity-95 backdrop-blur-md" style="background-color: var(--bg-color); border-color: var(--border-color);">
             <button class="nav-btn flex flex-col items-center gap-1 w-20 active-tab" data-target="view-oraculo">
                 <i data-lucide="compass" class="w-6 h-6"></i>
@@ -123,9 +227,7 @@
             </button>
         </nav>
 
-        <!-- ================= [MODAIS DO SISTEMA] ================= -->
-        
-        <!-- Modal Padrão (Busca/Altar/Quiz Ver Mais) -> Sobrepõe tudo z-60 -->
+        <!-- MODAIS -->
         <div id="modal-item" class="fixed inset-0 z-[60] hidden flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm opacity-0 transition-opacity duration-300">
             <div id="item-container" class="crystal-card relative w-full sm:max-w-[380px] max-h-[90vh] h-[85vh] sm:h-auto sm:rounded-2xl rounded-t-3xl overflow-y-auto no-scrollbar flex flex-col translate-y-full transition-transform duration-300">
                 <button id="close-item" class="absolute top-4 right-4 p-2 bg-black/30 rounded-full text-white z-10 hover:bg-black/50 backdrop-blur-md">
@@ -135,7 +237,6 @@
             </div>
         </div>
 
-        <!-- Modal Quiz -> z-50 -->
         <div id="modal-quiz" class="fixed inset-0 z-[50] hidden flex flex-col bg-white overflow-hidden opacity-0 transition-opacity duration-300" style="background-color: var(--bg-color);">
             <header class="p-5 flex justify-between items-center border-b border-gray-200">
                 <span class="text-xs font-bold tracking-widest uppercase" style="color: var(--gold);">Descubra Sua Energia</span>
@@ -146,8 +247,554 @@
                 <div id="quiz-content" class="w-full max-w-sm mx-auto"></div>
             </div>
         </div>
-
     </main>
-    <script src="app.js"></script>
+
+    <script>
+        // ==========================================
+        // [BANCO DE DADOS EMBUTIDO] - Elimina a necessidade de fetch/data.json
+        // ==========================================
+        const DADOS_APP = {
+            "cristais": {
+                "ametista": {
+                    "nome": "Ametista", "tipo": "cristal", "imagem_url": "imagens/cristais/ametista.jpg",
+                    "tags": ["ansiedade", "dor de cabeça", "insônia", "intuição", "calma", "paz"],
+                    "chakra": "Frontal e Coronário",
+                    "energia": "Transmutação, intuição e calma mental. Afasta a negatividade.",
+                    "origem": "Brasil (RS) e Uruguai.",
+                    "geologia": "Variedade roxa do quartzo, formada em cavidades vulcânicas.",
+                    "cuidados": { "limpeza": "Lave em água corrente. Pode usar fumaça de incenso.", "energizacao": "Luz do luar. Evite a luz solar direta." },
+                    "sinergia": "lavanda"
+                },
+                "turmalina-negra": {
+                    "nome": "Turmalina Negra", "tipo": "cristal", "imagem_url": "imagens/cristais/turmalina_negra.jpg",
+                    "tags": ["proteção", "inveja", "peso", "aterramento", "medo"],
+                    "chakra": "Básico",
+                    "energia": "Proteção pesada, limpeza espiritual e aterramento.",
+                    "origem": "Brasil, África e EUA.",
+                    "geologia": "Ciclossilicato complexo de boro e alumínio.",
+                    "cuidados": { "limpeza": "Água corrente e sal grosso. É uma das poucas que aguenta bem o sal.", "energizacao": "Luz solar por 30 minutos para carga rápida." },
+                    "sinergia": "arruda"
+                },
+                "citrino": {
+                    "nome": "Citrino", "tipo": "cristal", "imagem_url": "imagens/cristais/citrino.jpg",
+                    "tags": ["prosperidade", "alegria", "foco", "energia", "cansaço"],
+                    "chakra": "Plexo Solar",
+                    "energia": "Abundância, alegria de viver e autoconfiança.",
+                    "origem": "Brasil e Madagascar.",
+                    "geologia": "Variedade amarela do quartzo, cor dada pelo ferro.",
+                    "cuidados": { "limpeza": "Raramente precisa de limpeza, mas pode ser lavado em água corrente.", "energizacao": "Sol da manhã (não excessivo para não clarear)." },
+                    "sinergia": "canela"
+                }
+            },
+            "incensos": {
+                "lavanda": {
+                    "nome": "Incenso de Lavanda", "tipo": "incenso", "imagem_url": "imagens/incensos/lavanda.jpg",
+                    "tags": ["estresse", "insônia", "dor de cabeça", "relaxamento", "calma"],
+                    "energia": "Purifica o ambiente e acalma pensamentos acelerados. Traz relaxamento profundo.",
+                    "como_usar": "Acenda no quarto 30 minutos antes de dormir ou durante momentos de tensão.",
+                    "sinergia": "ametista"
+                },
+                "arruda": {
+                    "nome": "Incenso de Arruda", "tipo": "incenso", "imagem_url": "imagens/incensos/arruda.jpg",
+                    "tags": ["proteção", "limpeza", "inveja", "mau olhado", "peso no ambiente"],
+                    "energia": "Forte descarrego energético. Quebra miasmas e energias densas paradas no ambiente.",
+                    "como_usar": "Passe a fumaça pelos cantos da casa, de dentro para fora, focando nas portas e janelas.",
+                    "sinergia": "turmalina-negra"
+                },
+                "canela": {
+                    "nome": "Incenso de Canela", "tipo": "incenso", "imagem_url": "imagens/incensos/canela.jpg",
+                    "tags": ["prosperidade", "energia", "desânimo", "foco", "ação"],
+                    "energia": "Acelerador vibracional. Traz calor humano, atrai sucesso financeiro e espanta o desânimo.",
+                    "como_usar": "Acenda no seu escritório ou local de trabalho. Sopre a fumaça de fora para dentro na porta de entrada.",
+                    "sinergia": "citrino"
+                }
+            }
+        };
+
+        // ==========================================
+        // [LÓGICA JAVASCRIPT]
+        // ==========================================
+        let dbCrystals = DADOS_APP.cristais;
+        let dbIncenses = DADOS_APP.incensos;
+        let meuAltar = JSON.parse(localStorage.getItem('altarFloresta')) || { colecao: [], desejo:[] };
+        const IMG_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C0A062' stroke-width='1'%3E%3Cpath d='M12 2L2 12l10 10 10-10L12 2z'/%3E%3C/svg%3E";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            
+            // Renderização inicial
+            renderizarListaCatalogo('todos', '');
+            verificarCartaDoDia();
+            
+            configurarNavegacaoAbas();
+            configurarBuscaEFiltros();
+            configurarSistemaAltar();
+            configurarOraculoCartaGigante();
+            configurarFluxoQuiz();
+            
+            document.getElementById('close-item').addEventListener('click', fecharModalPadrao);
+        });
+
+        function dispararVibracao(tipo) {
+            if (!("vibrate" in navigator)) return;
+            if (tipo === 'click') navigator.vibrate(30);
+            if (tipo === 'sucesso') navigator.vibrate([100, 50, 100]);
+            if (tipo === 'magica') navigator.vibrate([50, 100, 50, 150, 50, 200]);
+        }
+
+        function configurarNavegacaoAbas() {
+            const botoes = document.querySelectorAll('.nav-btn');
+            const views = document.querySelectorAll('.tab-content');
+
+            botoes.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.getAttribute('data-target');
+                    views.forEach(v => v.classList.add('hidden'));
+                    document.getElementById(target).classList.remove('hidden', 'opacity-0');
+
+                    botoes.forEach(b => { b.classList.remove('active-tab'); b.classList.add('opacity-50'); });
+                    btn.classList.add('active-tab'); btn.classList.remove('opacity-50');
+
+                    if(target === 'view-altar') atualizarExibicaoAltar();
+                });
+            });
+        }
+
+        function obterDadosDoItem(id) {
+            if (dbCrystals[id]) return { ...dbCrystals[id], id, categoria: 'cristal' };
+            if (dbIncenses[id]) return { ...dbIncenses[id], id, categoria: 'incenso' };
+            return null;
+        }
+
+        function gerarHtmlDetalhesItem(id, isTarot = false) {
+            const item = obterDadosDoItem(id);
+            if (!item) return '';
+
+            const taNaColecao = meuAltar.colecao.includes(id);
+            const taNoDesejo = meuAltar.desejo.includes(id);
+            const isCristal = item.tipo === 'cristal';
+            const tagInfo = isCristal ? `Chakra: ${item.chakra}` : `Modo de Uso: ${item.como_usar}`;
+
+            let sinergiaHTML = '';
+            if (item.sinergia) {
+                const par = obterDadosDoItem(item.sinergia);
+                if (par) {
+                    sinergiaHTML = `
+                        <div class="mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                            <h3 class="font-bold uppercase tracking-wider text-[10px] mb-2 flex items-center gap-2" style="color: var(--gold);">
+                                <i data-lucide="sparkles" class="w-3 h-3"></i> Sinergia
+                            </h3>
+                            <div onclick="abrirModalPadrao('${par.id}')" class="flex items-center gap-3 p-2 rounded-xl border border-[#C0A062] cursor-pointer" style="background-color: rgba(192, 160, 98, 0.05);">
+                                <div class="w-10 h-10 rounded-lg bg-cover bg-center bg-[#E6E0D4]" style="background-image: url('${par.imagem_url || IMG_PLACEHOLDER}')"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold" style="color: var(--text-main);">${par.nome}</p>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-[#C0A062]"></i>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            let cuidadosHTML = '';
+            if (isCristal && item.cuidados) {
+                cuidadosHTML = `
+                    <details class="group p-3 mt-3 rounded-xl border transition-all" style="background-color: var(--bg-color); border-color: var(--border-color);">
+                        <summary class="font-bold text-[10px] uppercase tracking-wider flex justify-between items-center outline-none cursor-pointer" style="color: var(--text-main);">
+                            Como Cuidar <i data-lucide="chevron-down" class="w-3 h-3 group-open:rotate-180 transition-transform" style="color: var(--accent-green);"></i>
+                        </summary>
+                        <div class="pt-2 mt-2 border-t space-y-2 text-[11px] leading-relaxed" style="border-color: var(--border-color); color: var(--text-muted);">
+                            <p><strong style="color: var(--accent-green);">Limpeza:</strong> ${item.cuidados.limpeza}</p>
+                            <p><strong style="color: var(--accent-green);">Energização:</strong> ${item.cuidados.energizacao}</p>
+                        </div>
+                    </details>
+                `;
+            }
+
+            let btnFecharTarotHTML = '';
+            if(isTarot) {
+                btnFecharTarotHTML = `
+                    <button onclick="fecharCartaGigante(event)" class="w-full mt-6 py-4 rounded-xl font-bold text-white shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2" style="background-color: var(--text-main);">
+                        Guardar Carta
+                    </button>
+                `;
+            }
+
+            return `
+                <div class="conteudo-verso-interno block w-full">
+                    <div class="h-44 w-full bg-cover bg-center relative bg-[#E6E0D4] shrink-0" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}');">
+                        <div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest text-[#C0A062] border border-[#C0A062]">Carta do Dia</div>
+                    </div>
+                    <div class="px-5 -mt-4 relative z-10 pb-8">
+                        <h2 class="text-3xl font-serif font-bold mb-0.5" style="color: var(--text-main);">${item.nome}</h2>
+                        <p class="text-[10px] font-bold uppercase tracking-widest mb-6" style="color: var(--gold);">${tagInfo}</p>
+                        
+                        <div class="flex gap-2 mb-6">
+                            <button onclick="alternarItemAltar('${id}', 'colecao', ${isTarot})" class="flex-1 py-3 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${taNaColecao ? 'bg-[#2E4F2B] text-white' : 'bg-[#E6E0D4] text-[#3E2723]'}">
+                                ${taNaColecao ? "Na Coleção" : "Já Tenho"}
+                            </button>
+                            <button onclick="alternarItemAltar('${id}', 'desejo', ${isTarot})" class="flex-1 py-3 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 ${taNoDesejo ? 'bg-[#C0A062] text-white' : 'bg-transparent border border-[#C0A062] text-[#C0A062]'}">
+                                ${taNoDesejo ? "Desejado" : "Eu Quero"}
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-4 text-sm text-[#795548] leading-relaxed">
+                            <p>${item.energia}</p>
+                            ${cuidadosHTML}
+                            ${sinergiaHTML}
+                        </div>
+                        
+                        ${btnFecharTarotHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        // LÓGICA DO ORÁCULO E CARTA GIGANTE
+        const tarotScene = document.getElementById('tarot-scene');
+        const tarotCard = document.getElementById('tarot-card');
+        const tarotOverlay = document.getElementById('tarot-overlay');
+        const tarotBackContent = document.getElementById('tarot-back-content');
+        let isTarotFlipping = false;
+
+        function verificarCartaDoDia() {
+            const hoje = new Date().toLocaleDateString();
+            const storage = JSON.parse(localStorage.getItem('cartaDoDia'));
+            
+            if (storage && storage.data === hoje) {
+                tarotBackContent.innerHTML = gerarHtmlDetalhesItem(storage.id, true);
+                lucide.createIcons();
+                tarotCard.classList.add('flipped');
+                tarotScene.classList.add('carta-ja-revelada');
+            }
+        }
+
+        function configurarOraculoCartaGigante() {
+            tarotScene.addEventListener('click', () => {
+                if (isTarotFlipping || tarotScene.classList.contains('is-expanding')) return;
+                
+                const hoje = new Date().toLocaleDateString();
+                const storage = JSON.parse(localStorage.getItem('cartaDoDia'));
+
+                if (storage && storage.data === hoje) {
+                    ativarZoomCarta();
+                    return;
+                }
+                executarSorteioNovo(hoje);
+            });
+        }
+
+        function ativarZoomCarta() {
+            isTarotFlipping = true;
+            dispararVibracao('click');
+            tarotOverlay.classList.add('active');
+            tarotScene.classList.add('is-expanding'); 
+            setTimeout(() => {
+                tarotScene.classList.add('placed-on-table');
+                isTarotFlipping = false;
+            }, 100);
+        }
+
+        function executarSorteioNovo(dataHoje) {
+            isTarotFlipping = true;
+            dispararVibracao('magica');
+            tarotCard.classList.add('suspense-ativo');
+            
+            const chaves = Object.keys(dbCrystals);
+            const idSorteado = chaves[Math.floor(Math.random() * chaves.length)];
+            
+            localStorage.setItem('cartaDoDia', JSON.stringify({ data: dataHoje, id: idSorteado }));
+            
+            tarotBackContent.innerHTML = gerarHtmlDetalhesItem(idSorteado, true);
+            lucide.createIcons();
+            tarotBackContent.scrollTop = 0;
+            
+            setTimeout(() => {
+                tarotOverlay.classList.add('active');
+                tarotScene.classList.add('is-expanding'); 
+                setTimeout(() => {
+                    tarotCard.classList.add('flipped');
+                    dispararVibracao('click');
+                    setTimeout(() => {
+                        tarotScene.classList.add('placed-on-table');
+                        isTarotFlipping = false;
+                        tarotScene.classList.add('carta-ja-revelada');
+                    }, 800); 
+                }, 200);
+            }, 1000);
+        }
+
+        function fecharCartaGigante(event) {
+            if(event) event.stopPropagation(); 
+            dispararVibracao('click');
+            tarotScene.classList.remove('placed-on-table');
+            tarotScene.classList.remove('is-expanding');
+            tarotOverlay.classList.remove('active');
+            
+            setTimeout(() => {
+                tarotCard.classList.remove('suspense-ativo');
+                tarotBackContent.scrollTop = 0; 
+            }, 600);
+        }
+
+        // LÓGICA DO MODAL DE ITEM
+        function abrirModalPadrao(id) {
+            dispararVibracao('click');
+            const content = document.getElementById('item-content');
+            content.innerHTML = gerarHtmlDetalhesItem(id, false);
+            lucide.createIcons();
+            document.getElementById('item-container').scrollTop = 0;
+            const modal = document.getElementById('modal-item');
+            const container = document.getElementById('item-container');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                container.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function fecharModalPadrao() {
+            const modal = document.getElementById('modal-item');
+            const container = document.getElementById('item-container');
+            container.classList.add('translate-y-full');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // LÓGICA DO ALTAR
+        function salvarDadosAltar() { localStorage.setItem('altarFloresta', JSON.stringify(meuAltar)); }
+
+        function alternarItemAltar(id, tipo, recarregarTarot = false) {
+            dispararVibracao('sucesso');
+            const outroTipo = tipo === 'colecao' ? 'desejo' : 'colecao';
+            meuAltar[outroTipo] = meuAltar[outroTipo].filter(i => i !== id);
+            if (meuAltar[tipo].includes(id)) meuAltar[tipo] = meuAltar[tipo].filter(i => i !== id);
+            else meuAltar[tipo].push(id);
+            salvarDadosAltar();
+            
+            if (recarregarTarot) {
+                const container = document.getElementById('tarot-back-content');
+                const pos = container.scrollTop;
+                container.innerHTML = gerarHtmlDetalhesItem(id, true);
+                container.scrollTop = pos;
+            } else {
+                const container = document.getElementById('item-container');
+                const pos = container.scrollTop;
+                document.getElementById('item-content').innerHTML = gerarHtmlDetalhesItem(id, false);
+                container.scrollTop = pos;
+            }
+            lucide.createIcons();
+            if(!document.getElementById('view-altar').classList.contains('hidden')) atualizarExibicaoAltar();
+        }
+
+        let abaAltarAtiva = 'colecao';
+        function configurarSistemaAltar() {
+            const btnColecao = document.getElementById('btn-colecao');
+            const btnDesejos = document.getElementById('btn-desejos');
+            const setAba = (ativo, inativo, aba) => {
+                abaAltarAtiva = aba;
+                ativo.classList.remove('opacity-60', 'bg-transparent');
+                ativo.classList.add('bg-white', 'shadow-sm');
+                inativo.classList.add('opacity-60', 'bg-transparent');
+                inativo.classList.remove('bg-white', 'shadow-sm');
+                atualizarExibicaoAltar();
+            };
+            btnColecao.onclick = () => setAba(btnColecao, btnDesejos, 'colecao');
+            btnDesejos.onclick = () => setAba(btnDesejos, btnColecao, 'desejo');
+        }
+
+        function gerarCardListagemHTML(item) {
+            const taNaColecao = meuAltar.colecao.includes(item.id);
+            const taNoDesejo = meuAltar.desejo.includes(item.id);
+            const badgeColor = item.tipo === 'cristal' ? 'bg-[#2E4F2B]' : 'bg-[#C0A062]';
+            return `
+                <div onclick="abrirModalPadrao('${item.id}')" class="crystal-card rounded-xl overflow-hidden flex flex-col relative cursor-pointer">
+                    <div class="absolute top-2 left-2 z-10 text-[9px] text-white px-2 py-0.5 rounded-full uppercase font-bold tracking-wider ${badgeColor}">${item.tipo}</div>
+                    ${taNaColecao ? '<i data-lucide="check-circle" class="absolute top-2 right-2 text-green-500 bg-white rounded-full w-5 h-5 z-10 shadow-sm"></i>' : ''}
+                    ${taNoDesejo ? '<i data-lucide="heart" class="absolute top-2 right-2 text-[#C0A062] bg-white rounded-full w-5 h-5 z-10 shadow-sm"></i>' : ''}
+                    <div class="h-32 bg-cover bg-center border-b relative bg-[#E6E0D4]" style="background-image: url('${item.imagem_url || IMG_PLACEHOLDER}');"></div>
+                    <div class="p-3">
+                        <p class="font-bold text-sm truncate w-full" style="color: var(--text-main);">${item.nome}</p>
+                        <p class="text-[10px] truncate w-full mt-0.5" style="color: var(--text-muted);">${item.tags?.slice(0,2).join(', ') || ''}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function atualizarExibicaoAltar() {
+            const container = document.getElementById('altar-results');
+            const listaIds = meuAltar[abaAltarAtiva];
+            if(listaIds.length === 0) {
+                container.innerHTML = `<p class="text-center py-10 col-span-2 text-sm text-[#795548]">Seu espaço está vazio.</p>`;
+                return;
+            }
+            container.innerHTML = listaIds.map(id => {
+                const item = obterDadosDoItem(id);
+                return item ? gerarCardListagemHTML(item) : '';
+            }).join('');
+            lucide.createIcons();
+        }
+
+        // LÓGICA DE EXPLORAR
+        function configurarBuscaEFiltros() {
+            const input = document.getElementById('search-input');
+            const btns = document.querySelectorAll('.filter-btn');
+            let filtroAtual = 'todos';
+            const rodarPesquisa = () => { renderizarListaCatalogo(filtroAtual, input.value.toLowerCase()); };
+            input.addEventListener('input', rodarPesquisa);
+            btns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btns.forEach(b => {
+                        b.style.backgroundColor = 'transparent'; b.style.color = 'var(--text-muted)'; b.style.borderColor = 'var(--border-color)';
+                    });
+                    btn.style.backgroundColor = 'var(--accent-green)'; btn.style.color = 'white'; btn.style.borderColor = 'var(--accent-green)';
+                    filtroAtual = btn.getAttribute('data-filter');
+                    rodarPesquisa();
+                });
+            });
+        }
+
+        function renderizarListaCatalogo(filtro, termo) {
+            const container = document.getElementById('explorar-results');
+            let resultados = [];
+            const buscarEmBanco = (banco) => {
+                return Object.values(banco).filter(item => {
+                    if(termo === '') return true;
+                    return item.nome.toLowerCase().includes(termo) || item.tags?.some(tag => tag.toLowerCase().includes(termo));
+                });
+            };
+            if (filtro === 'todos' || filtro === 'cristal') {
+                const c = buscarEmBanco(dbCrystals).map(i => ({...i, id: Object.keys(dbCrystals).find(k=>dbCrystals[k].nome===i.nome)}));
+                resultados = resultados.concat(c);
+            }
+            if (filtro === 'todos' || filtro === 'incenso') {
+                const i = buscarEmBanco(dbIncenses).map(x => ({...x, id: Object.keys(dbIncenses).find(k=>dbIncenses[k].nome===x.nome)}));
+                resultados = resultados.concat(i);
+            }
+            if(resultados.length === 0) {
+                container.innerHTML = `<p class="col-span-2 text-center text-sm py-10" style="color: var(--text-muted);">Nenhuma energia encontrada.</p>`;
+                return;
+            }
+            container.innerHTML = resultados.map(item => gerarCardListagemHTML(item)).join('');
+            lucide.createIcons();
+        }
+
+        // LÓGICA DO QUIZ
+        const PERGUNTAS_SITUACIONAIS = [
+            { text: "Como sua mente se comportou ao deitar para dormir nas últimas noites?", options: [{txt: "Acelerada, pensando no futuro.", val: "calma"}, {txt: "Pesada, absorvendo energia dos outros.", val: "protecao"}, {txt: "Tranquila, mas acordo sem energia.", val: "vitalidade"}] },
+            { text: "Onde você costuma sentir tensão física quando passa por um estresse?", options: [{txt: "Na cabeça, testa ou nuca.", val: "calma"}, {txt: "No peito ou na garganta.", val: "comunicacao"}, {txt: "No estômago ou ombros.", val: "vitalidade"}] },
+            { text: "Se a sua energia atual fosse um clima, qual seria?", options: [{txt: "Tempestade agitada e imprevisível.", val: "calma"}, {txt: "Dia nublado, estagnado e sem brilho.", val: "vitalidade"}, {txt: "Vento seco, disperso e sem foco.", val: "foco"}] },
+            { text: "O que você sente que está 'bloqueado' na sua vida hoje?", options: [{txt: "Minha comunicação e expressão.", val: "comunicacao"}, {txt: "Minha prosperidade ou ânimo.", val: "vitalidade"}, {txt: "Minha intuição e amor próprio.", val: "amor"}] },
+            { text: "Escolha um elemento da natureza para te abraçar agora:", options: [{txt: "Água (para limpar e fluir).", val: "amor"}, {txt: "Fogo (para transformar).", val: "vitalidade"}, {txt: "Terra (para enraizar).", val: "protecao"}] },
+            { text: "Qual palavra soa como um remédio para sua alma hoje?", options: [{txt: "Aterramento", val: "protecao"}, {txt: "Coragem", val: "vitalidade"}, {txt: "Paz", val: "calma"}] }
+        ];
+
+        let indicePerguntaAtual = 0;
+        let arrayDeRespostas = [];
+
+        function configurarFluxoQuiz() {
+            const btn = document.getElementById('btn-iniciar-quiz');
+            if(btn) btn.addEventListener('click', iniciarTelaQuiz);
+            const close = document.getElementById('close-quiz');
+            if(close) close.addEventListener('click', fecharTelaQuiz);
+        }
+
+        function iniciarTelaQuiz() {
+            dispararVibracao('click');
+            indicePerguntaAtual = 0;
+            arrayDeRespostas = [];
+            document.getElementById('modal-quiz').classList.remove('hidden');
+            setTimeout(() => document.getElementById('modal-quiz').classList.remove('opacity-0'), 10);
+            renderizarEtapaQuiz();
+        }
+
+        function fecharTelaQuiz() {
+            document.getElementById('modal-quiz').classList.add('opacity-0');
+            setTimeout(() => document.getElementById('modal-quiz').classList.add('hidden'), 300);
+        }
+
+        function renderizarEtapaQuiz() {
+            const container = document.getElementById('quiz-content');
+            const barra = document.getElementById('quiz-progress');
+            barra.style.width = `${((indicePerguntaAtual) / PERGUNTAS_SITUACIONAIS.length) * 100}%`;
+
+            if (indicePerguntaAtual >= PERGUNTAS_SITUACIONAIS.length) {
+                calcularEExibirResultado();
+                return;
+            }
+
+            const q = PERGUNTAS_SITUACIONAIS[indicePerguntaAtual];
+            container.innerHTML = `
+                <div class="fade-in">
+                    <p class="text-[10px] text-center font-bold tracking-widest text-[#C0A062] mb-4">PERGUNTA ${indicePerguntaAtual + 1} DE ${PERGUNTAS_SITUACIONAIS.length}</p>
+                    <h2 class="text-xl font-serif font-bold text-center mb-8" style="color: var(--text-main);">${q.text}</h2>
+                    <div class="space-y-3">
+                        ${q.options.map((opt) => `
+                            <button onclick="salvarRespostaQuiz('${opt.val}')" class="w-full text-left p-4 rounded-xl border border-[#E6E0D4] bg-white active:bg-gray-50 transition-colors shadow-sm text-sm" style="color: var(--text-main);">
+                                ${opt.txt}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function salvarRespostaQuiz(valor) {
+            dispararVibracao('click');
+            arrayDeRespostas.push(valor);
+            indicePerguntaAtual++;
+            renderizarEtapaQuiz();
+        }
+
+        function calcularEExibirResultado() {
+            dispararVibracao('magica');
+            document.getElementById('quiz-progress').style.width = '100%';
+            const contagem = arrayDeRespostas.reduce((acc, val) => { acc[val] = (acc[val] || 0) + 1; return acc; }, {});
+            const sentimentoDominante = Object.keys(contagem).reduce((a, b) => contagem[a] > contagem[b] ? a : b);
+
+            const prescricoes = {
+                "calma": { c: "ametista", i: "lavanda", msg: "Notamos que sua mente está acelerada e pedindo descanso. Este ritual vai desacelerar seus pensamentos." },
+                "protecao": { c: "turmalina-negra", i: "arruda", msg: "Você está absorvendo o ambiente. É hora de fechar seu campo energético e descarregar o peso." },
+                "vitalidade": { c: "citrino", i: "canela", msg: "Sua energia criativa e de ação precisa de um choque de vida. Vamos reaquecer seu fogo interno." },
+                "foco": { c: "citrino", i: "canela", msg: "Sua mente dispersa precisa de aterramento e direção. Este ritual estimula a clareza mental." },
+                "comunicacao": { c: "ametista", i: "lavanda", msg: "Há nós emocionais travando sua expressão. Transmute isso com calma e paz." },
+                "amor": { c: "ametista", i: "lavanda", msg: "Conecte-se com seu chakra superior para ouvir sua intuição pura." }
+            };
+
+            const ritual = prescricoes[sentimentoDominante] || prescricoes["calma"];
+            const cristalObj = obterDadosDoItem(ritual.c);
+            const incensoObj = obterDadosDoItem(ritual.i);
+            const container = document.getElementById('quiz-content');
+            
+            container.innerHTML = `
+                <div class="fade-in text-center pb-10">
+                    <i data-lucide="sparkles" class="w-10 h-10 mx-auto mb-4" style="color: var(--gold);"></i>
+                    <h2 class="text-2xl font-serif font-bold mb-2" style="color: var(--text-main);">Seu Ritual Perfeito</h2>
+                    <p class="text-sm mb-8 leading-relaxed" style="color: var(--text-muted);">${ritual.msg}</p>
+                    <div class="flex flex-col gap-4 text-left">
+                        <div class="flex items-center gap-4 p-3 rounded-xl border border-[#2E4F2B] bg-[#2E4F2B]/5">
+                            <div class="w-16 h-16 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('${cristalObj.imagem_url || IMG_PLACEHOLDER}')"></div>
+                            <div class="flex-1">
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-[#2E4F2B]">Pedra Guia</p>
+                                <p class="font-bold text-[#3E2723]">${cristalObj.nome}</p>
+                            </div>
+                            <button onclick="abrirModalPadrao('${ritual.c}')" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-[#2E4F2B] text-[#2E4F2B] active:bg-[#2E4F2B] active:text-white transition-colors">Ver mais</button>
+                        </div>
+                        <div class="flex justify-center -my-2 z-10"><div class="w-6 h-6 rounded-full bg-white border border-[#C0A062] flex items-center justify-center font-bold text-xs text-[#C0A062]">+</div></div>
+                        <div class="flex items-center gap-4 p-3 rounded-xl border border-[#C0A062] bg-[#C0A062]/5">
+                            <div class="w-16 h-16 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('${incensoObj.imagem_url || IMG_PLACEHOLDER}')"></div>
+                            <div class="flex-1">
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-[#C0A062]">Aromaterapia</p>
+                                <p class="font-bold text-[#3E2723]">${incensoObj.nome}</p>
+                            </div>
+                            <button onclick="abrirModalPadrao('${ritual.i}')" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-[#C0A062] text-[#C0A062] active:bg-[#C0A062] active:text-white transition-colors">Ver mais</button>
+                        </div>
+                    </div>
+                    <button onclick="fecharTelaQuiz()" class="w-full mt-10 py-4 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-transform" style="background-color: var(--accent-green);">Finalizar Teste</button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>
