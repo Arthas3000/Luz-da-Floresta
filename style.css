@@ -22,7 +22,7 @@ body {
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
-/* CORREÇÃO: Usar transform: none no estado final para evitar a criação de um Containing Block persistente */
+/* CORREÇÃO 1: 'transform: none' no final impede que a div atue como Containing Block para o position: fixed */
 @keyframes fadeIn { 
     from { opacity: 0; transform: translateY(10px); } 
     to { opacity: 1; transform: none; } 
@@ -67,14 +67,15 @@ body {
 }
 
 /* ESTADO EXPANDIDO (ZOOM E REVELAÇÃO) */
+/* CORREÇÃO 2: Cálculo real de centro e uso do DVH para contornar address bars mobile */
 .tarot-scene.is-expanding {
     position: fixed; 
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); 
     width: 94vw; max-width: 380px;
-    height: 85vh; max-height: 700px;
-    margin: 0; /* Previne interferência do margin: 0 auto original no cálculo */
+    height: 85dvh; max-height: 700px;
+    margin: 0 !important; /* Previne que o auto-margin original desalinhe o cálculo */
     z-index: 70;
 }
 
